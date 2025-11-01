@@ -164,6 +164,12 @@ export const telaahStafFormMethods = {
         });
       } else {
         if (response.status === 422) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Gagal submit form, cek kembali data yang Anda masukkan.',
+            timer: 5000,
+          });
           this.errors = data.errors || {};
         } else {
           Swal.fire({
