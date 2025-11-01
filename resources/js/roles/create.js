@@ -8,9 +8,14 @@ export const createMethods = {
     this.$nextTick(async () => {
       await this.fetchPermissions();
 
-      // validasi form
-      setTimeout(() => {
-        this.$refs.nameInput.focus();
+      // Cek apakah bukan touch device
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+      this.$nextTick(() => {
+        // Focus hanya di desktop
+        if (!isTouchDevice) {
+          this.$refs.nameInput.focus();
+        }
 
         this.validateForm('name');
         this.validateForm('permissions');
