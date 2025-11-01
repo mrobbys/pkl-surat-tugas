@@ -25,7 +25,7 @@ class UpdateUserRequest extends FormRequest
         $id = $this->user?->id ?? null;
         return [
             'nip' => 'required|digits:18|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|unique:users,nip,' . $id,
-            'nama_lengkap' => 'required|string|min:3|max:255|regex:/^(?!.*[.,]{2})[A-Za-zÀ-ÿ\s.,]+(?<![.,])$/u|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i',
+            'nama_lengkap' => 'required|string|min:3|max:255|regex:/^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s.,\'"-]*[A-Za-zÀ-ÿ.,]$/u|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i',
             'email' => 'required|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|email:dns|unique:users,email,' . $id,
             'password' => ['nullable', 'string', 'not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i', Password::min(8)->mixedCase()->numbers()->symbols()],
             'roles' => 'required|array|min:1|max:5|exists:roles,id',

@@ -2,6 +2,7 @@ export const stateTelaahStafForm = {
   mode: 'create',
   loading: false,
   suratId: null,
+  editingId: null,
   form: {
     kepada_yth: '',
     dari: '',

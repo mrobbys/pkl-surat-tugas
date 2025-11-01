@@ -24,7 +24,7 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'nip' => 'required|digits:18|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|unique:users,nip',
-            'nama_lengkap' => 'required|string|regex:/^(?!.*[.,]{2})[A-Za-zÀ-ÿ\s.,]+(?<![.,])$/u|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|min:3|max:255',
+            'nama_lengkap' => 'required|string|regex:/^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s.,\'"-]*[A-Za-zÀ-ÿ.,]$/u|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|min:3|max:255',
             'email' => 'required|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|email:dns|unique:users,email',
             'password' => ['required', 'string', 'not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i', Password::min(8)->mixedCase()->numbers()->symbols()],
             'roles' => 'required|array|min:1|max:5|exists:roles,id',

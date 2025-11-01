@@ -26,7 +26,7 @@ export const validationForm = {
     // validasi nama lengkap
     if (field === 'nama_lengkap') {
       const namaLengkap = this.form.nama_lengkap;
-      const namaRegex = /^(?!.*[.,]{2})[A-Za-zÀ-ÿ\s.,]+$/u;
+      const namaRegex = /^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s.,'"-]*[A-Za-zÀ-ÿ.,]$/u;
 
       if (namaLengkap.length > 0) {
         if (!namaRegex.test(namaLengkap)) {
@@ -154,7 +154,7 @@ export const validationForm = {
     // regex nip hanya angka
     const nipRegex = /^\d*$/;
     // regex nama lengkap hanya huruf, spasi, titik, koma
-    const namaRegex = /^(?!.*[.,]{2})[A-Za-zÀ-ÿ\s.,]+$/u;
+    const namaRegex = /^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s.,'"-]*[A-Za-zÀ-ÿ.,]$/u;
     // regex email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     // regex jabatan hanya huruf dan spasi

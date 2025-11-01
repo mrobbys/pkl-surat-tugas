@@ -56,6 +56,8 @@ export function telaahStafForm(mode, surat, data, formConfig) {
     mode: mode,
     suratId: surat?.id || null,
 
+    editingId: mode === 'edit' ? surat?.id : null,
+    
     form: {
       kepada_yth: data?.kepada_yth || '',
       dari: data?.dari || '',
