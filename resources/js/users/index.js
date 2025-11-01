@@ -121,6 +121,7 @@ export const indexMethods = {
           allowHTML: true,
           trigger: 'mouseenter',
           hideOnClick: true,
+          touch: false,
         });
       }
     });
