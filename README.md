@@ -61,7 +61,7 @@ Sebelum memulai, pastikan Anda telah menginstal beberapa software berikut ini:
 
 ## ⚙️ Cara Instalasi dan Menjalankan Proyek
 
-1.  **Clone repositori** ini dan masuk ke direktorinya:
+1.  **Clone repositori** ini:
     ```bash
     git clone https://github.com/mrobbys/surat-tugas-lapangan.git
     ```
