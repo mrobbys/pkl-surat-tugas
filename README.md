@@ -1,65 +1,134 @@
-<<<<<<< HEAD
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Surat Tugas Lapangan - Diskominfo Kota Banjarbaru
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi ini adalah sistem manajemen internal yang dirancang untuk mengelola proses pengajuan, penelaahan, persetujuan, dan pembuatan surat-surat. Adapun untuk surat yang dihasilkan seperti Surat Telaahan Staf, Nota Dinas, dan Surat Tugas.
 
-## About Laravel
+Sistem ini dibangun menggunakan Laravel 12, Tailwind CSS 4, Alpine.js, dan PostgreSQL.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+✨ Fitur Utama
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+•	Manajemen Role & Permissions: Sistem otorisasi menggunakan spatie/laravel-permission untuk mengatur hak ases pengguna.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+•	Master Data: CRUD (Create, Read, Update, Delete) untuk data pendukung seperti Pangkat & Golongan pegawai.
 
-## Learning Laravel
+•	Manajemen Pengguna: Kemampuan untuk mengelola pengguna yang dapat mengakses sistem.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+•	Manajemen Surat Tugas:
+	•	Membuat pengajuan surat baru.
+	•	Melihat daftar dan detail surat.
+	•	Mengedit dan menghapus surat.
+	•	Approve Surat Telaah Staf berjenjang, Level 1 = Kabid, level 2 = Kadis.
+	•	Status surat tugas berjenjang antara lain diajukan, disetujui_kabid, revisi_kabid, ditolak_kabid, disetujui_kadis, revisi_kadis, ditolak_kadis.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+•	Alur Pembuatan Surat Tugas:
+	•	Kasi membuat Surat Telaah Staf, yang nanti dapat ditinjau dan disetujui oleh Kabid dan Kadis.
+	•	Pemberian status Surat Telaah Staf antara lain disetujui, direvisi, dan ditolak.
+	•	Jika status surat = disetujui_kadis, maka akan menghasilkan Nota Dinas, dan Surat Tugas.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+•	Dokumen PDF Yang Dihasilkan: Mencetak dokumen seperti Telaah Staf, Nota Dinas, dan Surat Tugas langsung dari data yang ada di sistem.
 
-## Laravel Sponsors
+🛠️ Teknologi yang Digunakan
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+•	PHP ^8.2
+•	Laravel 12
+•	PostgreSQL
+•	Spatie Laravel Permission (untuk manajemen role dan hak akses)
+•	Vite (sebagai build tool)
+•	Tailwind CSS 4
+•	Alpine.js
+•	SweetAlert2 (https://sweetalert2.github.io/#download)
+•	mPdf (https://mpdf.github.io/)
 
-### Premium Partners
+📦 Prasyarat Instalasi
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Sebelum memulai, pastikan Anda telah menginsal beberapa software berikut ini:
+•	PHP (versi ^8.2)
+•	Composer
+•	Node.js & NPM (atau Yarn)
+•	Server Database PostgreSQL
 
-## Contributing
+⚙️ Cara Instalasi dan Menjalankan Proyek
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1.	Clone Repo github ini:
+	git clone https://github.com/mrobbys/surat-tugas-lapangan.git
 
-## Code of Conduct
+2.	Install dependensi, gunakan Composer dan NPM:
+	composer install
+	npm install
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+3.	Salin file .env.example menjadi .env baru:
+	cp .env.example .env
 
-## Security Vulnerabilities
+4.	Generate kunci aplikasi (APP_KEY):
+	php artisan key:generate
+	
+5.	Konfigurasi file .env untuk koneksi ke database PostgreSQL:
+	DB_CONNECTION=pgsql
+	DB_HOST=127.0.0.1
+	DB_PORT=3306
+	DB_DATABASE=surat_tugas_lapangan
+	DB_USERNAME=username_postgre_anda
+	DB_PASSWORD=password_postgre_anda
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+6.	Jalankan migrasi database:
+	php artisan migrate
+	
+7.	Jalankan database seeder:
+	php artisan db:seed
+	
+8.	Run website:
+	npm run dev
+	php artisan serve
+	
+🚀 Contoh Penggunaan (Login Awal)
 
-## License
+Setelah menjalankan php artisan db:seed, Anda dapat login menggunakan akun default dibawah ini yang dibuat oleh RolePermissionSeeder.php:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-=======
-# surat-tugas-lapangan
->>>>>>> 4871e84e3607854887a5a754bbd4321c4262655f
+Akun Super Admin
+•	Email 		:	superadmin@gmail.com
+•	Password	:	Password1.
+•	Hak Akses	:	Semua hak akses
+
+Akun Kasi
+•	Email 		:	kasi@gmail.com
+•	Password	:	Password1.
+•	Hak Akses	:	Akses halaman manajemen surat, tambah surat, edit surat, delete surat, pdf telaah staf, pdf nota dinas, pdf surat tugas.
+
+Akun Kabid
+•	Email 		:	kabid@gmail.com
+•	Password	:	Password1.
+•	Hak Akses	:	Akses halaman manajemen surat, approve telaah staf level 1, pdf telaah staf, pdf nota dinas, pdf surat tugas.
+
+Akun Kadis
+•	Email 		:	kadis@gmail.com
+•	Password	:	Password1.
+•	Hak Akses	:	Akses halaman manajemen surat, approve telaah staf level 2, pdf telaah staf, pdf nota dinas, pdf surat tugas.
+
+📂 Susunan Proyek (Struktur Direktori)
+
+surat-tugas-lapangan/
+├── app/
+│   ├── Http/Controllers/  # Logika utama (UserController, RoleController, SuratPerjalananDinasController, dll.)
+│   ├── Models/            # Model  Eloquent (User, SuratPerjalananDinas, PangkatGolongan)
+│   ├── Providers/         # App Service Providers
+│   └── Services/          # Logika bisnis yang dipisahkan (UserService, RoleService, dll.)
+├── config/                # File konfigurasi (database.php, permission.php, dll.)
+├── database/
+│   ├── migrations/        # Skema database
+│   └── seeders/           # Data awal (RolePermissionSeeder, PangkatGolonganSeeder, dll.)
+├── resources/
+│   ├── css/               # File CSS (app.css)
+│   ├── js/                # File JavaScript
+│   ├── views/
+│   │   ├── components/    # Komponen Blade (layout, sidebar, modal)
+│   │   ├── pages/         # Halaman utama aplikasi (dashboard, users, roles, surat)
+│   │   └── pdf/           # Template Blade untuk generate PDF (surat-tugas.blade.php, dll.)
+├── routes/
+│   ├── web.php            # Definisi rute utama aplikasi
+│   └── auth.php           # Rute untuk otentikasi
+├── public/                # Aset publik (gambar, dan file hasil build)
+├── .env.example           # Template untuk file konfigurasi environment
+├── composer.json          # Dependensi PHP (Laravel, Spatie)
+└── package.json           # Dependensi JavaScript (Tailwind, Vite)
+
+
+
