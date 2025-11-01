@@ -21,6 +21,24 @@ Sistem ini dibangun menggunakan Laravel 12, Tailwind CSS 4, Alpine.js, dan Postg
     * Jika status surat = `disetujui_kadis`, maka akan menghasilkan Nota Dinas, dan Surat Tugas.
 * **Dokumen PDF Yang Dihasilkan**: Mencetak dokumen seperti Telaah Staf, Nota Dinas, dan Surat Tugas langsung dari data yang ada di sistem.
 
+## 📸 Tampilan Aplikasi (Login dengan akun super-admin)
+
+* **Gambar 1: Tampilan Halaman Dashboard**:
+<img width="1280" height="694" alt="Screen Shot 2025-11-01 at 11 45 15" src="https://github.com/user-attachments/assets/5f1f7b2c-33a4-4f26-a46f-c5aaf7d956a6" />
+
+* **Gambar 2: Tampilan Halaman Manajemen Role**:
+<img width="1280" height="694" alt="Screen Shot 2025-11-01 at 11 45 27" src="https://github.com/user-attachments/assets/9444c525-3631-4dda-85f7-8b28e8bee180" />
+
+* **Gambar 3: Tampilan Halaman Pangkat Golongan**:
+<img width="1280" height="694" alt="Screen Shot 2025-11-01 at 11 45 38" src="https://github.com/user-attachments/assets/a352d90c-9503-4d8e-b80b-26919c78acdd" />
+
+* **Gambar 4: Tampilan Halaman Manajemen User**:
+<img width="1280" height="694" alt="Screen Shot 2025-11-01 at 11 46 00" src="https://github.com/user-attachments/assets/af6da381-6292-4103-b590-d2312aad35c4" />
+
+* **Gambar 5: Tampilan Halaman Surat Tugas**:
+<img width="1280" height="694" alt="Screen Shot 2025-11-01 at 11 47 05" src="https://github.com/user-attachments/assets/f9dd3451-d3d2-42f5-a51c-187460530cd1" />
+
+
 ## 🛠️ Teknologi yang Digunakan
 
 * PHP ^8.2
@@ -100,10 +118,10 @@ Setelah menjalankan `php artisan db:seed`, Anda dapat login menggunakan akun def
 
 | Role | Email | Password | Hak Akses |
 | :--- | :--- | :--- | :--- |
-| **Super Admin** | `superadmin@gmail.com` | `Password1.` | Semua hak akses |
-| **Kasi** | `kasi@gmail.com` | `Password1.` | Akses halaman manajemen surat, tambah surat, edit surat, delete surat, pdf telaah staf, pdf nota dinas, pdf surat tugas. |
-| **Kabid** | `kabid@gmail.com` | `Password1.` | Akses halaman manajemen surat, approve telaah staf level 1, pdf telaah staf, pdf nota dinas, pdf surat tugas. |
-| **Kadis** | `kadis@gmail.com` | `Password1.` | Akses halaman manajemen surat, approve telaah staf level 2, pdf telaah staf, pdf nota dinas, pdf surat tugas. |
+| **super-admin** | `superadmin@gmail.com` | `Password1.` | Semua hak akses |
+| **kasi** | `kasi@gmail.com` | `Password1.` | Akses halaman manajemen surat, tambah surat, edit surat, delete surat, pdf telaah staf, pdf nota dinas, pdf surat tugas. |
+| **kabid** | `kabid@gmail.com` | `Password1.` | Akses halaman manajemen surat, approve telaah staf level 1, pdf telaah staf, pdf nota dinas, pdf surat tugas. |
+| **kadis** | `kadis@gmail.com` | `Password1.` | Akses halaman manajemen surat, approve telaah staf level 2, pdf telaah staf, pdf nota dinas, pdf surat tugas. |
 
 ## 📂 Susunan Proyek (Struktur Direktori)
 
