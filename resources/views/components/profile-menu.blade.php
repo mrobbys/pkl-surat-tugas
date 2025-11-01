@@ -57,7 +57,7 @@
                     })
                 "
                 type="submit"
-                class="flex w-full cursor-pointer items-center gap-2 rounded-md bg-red-500 p-2 text-sm font-medium text-white transition-colors duration-300 hover:bg-red-700 focus:outline-hidden focus-visible:underline"
+                class="flex w-full cursor-pointer items-center gap-2 text-sm font-medium text-black focus:outline-hidden focus-visible:underline transition-transform duration-300 hover:-translate-y-1"
                 role="menuitem"
             >
                 <i class="ri-logout-box-r-line text-xl"></i>
