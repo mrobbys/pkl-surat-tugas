@@ -47,7 +47,7 @@ export const submitApproveTelaahStaf = {
             text:
               data.text ||
               data.message ||
-              'Terjadi kesalahan saat menyetujui telaah staf.',
+              'Terjadi kesalahan pada sistem. Silakan coba beberapa saat lagi.',
             timer: 5000,
           });
         }
@@ -57,7 +57,7 @@ export const submitApproveTelaahStaf = {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Terjadi kesalahan saat menyetujui telaah staf.',
+        text: 'Terjadi kesalahan pada sistem. Silakan coba beberapa saat lagi.',
         timer: 5000,
       });
     } finally {
