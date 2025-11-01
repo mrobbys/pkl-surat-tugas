@@ -163,14 +163,14 @@ export const telaahStafFormMethods = {
             title: 'Error',
             text: data.text ||
               data.message ||
-              'Terjadi kesalahan saat membuat telaah staf.',
+              'Terjadi kesalahan saat submit telaah staf.',
             timer: 5000,
           });
         }
       }
     } catch (error) {
       console.error('Error saving data:', error);
-      Swal.fire('Error', 'Terjadi kesalahan saat membuat telaah staf.',
+      Swal.fire('Error', 'Terjadi kesalahan saat submit telaah staf.',
         'error');
     } finally {
       this.loading = false;

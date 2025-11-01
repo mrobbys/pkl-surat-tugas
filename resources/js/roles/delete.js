@@ -21,12 +21,18 @@ export const deleteMethods = {
     // jika pengguna mengkonfirmasi
     if (result.isConfirmed) {
       try {
+        const payload = {
+          _method: 'DELETE',
+        };
+
         const response = await fetch(this.config.deleteUrl.replace('__ID__', id), {
-          method: 'DELETE',
+          method: 'POST',
           headers: {
+            'Content-Type': 'application/json',
             'X-CSRF-TOKEN': this.csrfToken,
             'X-Requested-With': 'XMLHttpRequest',
           },
+          body: JSON.stringify(payload),
         });
         const data = await response.json();
         if (response.ok) {
