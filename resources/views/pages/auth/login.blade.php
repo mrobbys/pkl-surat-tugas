@@ -124,6 +124,7 @@
             {{-- Button Submit Start --}}
             <div>
                 <button x-cloak
+                :disabled="!isFormValid() || loading"
                     type="submit"
                     class="w-full rounded-lg px-3 py-2"
                     x-bind:class="{
