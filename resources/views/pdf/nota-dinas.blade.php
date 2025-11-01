@@ -7,7 +7,7 @@
         content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible"
         content="ie=edge">
-    <title>Nota Dinas</title>
+    <title>Nota Dinas - {{ $surat->nomor_nota_dinas }}</title>
     <style>
         * {
             font-family: Arial, sans-serif;
