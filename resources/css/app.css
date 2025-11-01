@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+@theme {
+    --font-sans: "Poppins", sans-serif;
+}
+
+/* custom css */
+
+:root {
+    /* styling untuk stripe datatables */
+    --dt-row-stripe: 0, 0, 0 !important;
+    --dt-row-stripe-alpha: 0.04 !important;
+
+    /* styling untuk hover datatables */
+    --dt-row-hover: 0, 123, 255 !important;
+    --dt-row-hover-alpha: 0.06 !important;
+}
+
+/* styling entries per page datatables */
+div.dt-container select.dt-input {
+    border-radius: 10px !important;
+}
+
+/* styling pagination datatables */
+#role-table_wrapper .dt-paging .dt-paging-button,
+#pangkat-golongan-table_wrapper .dt-paging .dt-paging-button,
+#user-table_wrapper .dt-paging .dt-paging-button,
+#surat-table_wrapper .dt-paging .dt-paging-button {
+    border-radius: 10px !important;
+}
+
+/* styling hover (bukan yang aktif) */
+#role-table_wrapper .dt-paging .dt-paging-button:not(.current):hover,
+#pangkat-golongan-table_wrapper .dt-paging .dt-paging-button:not(.current):hover,
+#user-table_wrapper .dt-paging .dt-paging-button:not(.current):hover,
+#surat-table_wrapper .dt-paging .dt-paging-button:not(.current):hover {
+    background: #2563eb !important;
+    color: white !important;
+    border-color: #2563eb !important;
+}
+
+/* styling button pagination yang disabled */
+#role-table_wrapper .dt-paging .dt-paging-button.disabled,
+#pangkat-golongan-table_wrapper .dt-paging .dt-paging-button.disabled,
+#user-table_wrapper .dt-paging .dt-paging-button.disabled,
+#surat-table_wrapper .dt-paging .dt-paging-button.disabled {
+    cursor: not-allowed !important;
+    opacity: 0.5 !important;
+}
+
+/* styling button pagination yang aktif */
+#role-table_wrapper .dt-paging .dt-paging-button.current,
+#role-table_wrapper .dt-paging .dt-paging-button.current:hover,
+#pangkat-golongan-table_wrapper .dt-paging .dt-paging-button.current,
+#pangkat-golongan-table_wrapper .dt-paging .dt-paging-button.current:hover,
+#user-table_wrapper .dt-paging .dt-paging-button.current,
+#user-table_wrapper .dt-paging .dt-paging-button.current:hover,
+#surat-table_wrapper .dt-paging .dt-paging-button.current,
+#surat-table_wrapper .dt-paging .dt-paging-button.current:hover {
+    background: #1d4ed8 !important;
+    color: white !important;
+    border-color: #1d4ed8 !important;
+}
+
+/* kolom search input datatables */
+div.dt-container .dt-search input {
+    border-radius: 10px !important;
+    margin-left: 10px !important;
+    padding: 5px 10px !important;
+}
+
+@media only screen and (min-width: 380px) {
+    div.dt-container .dt-search input {
+        width: 250px !important;
+    }
+}
+
+/* styling untuk tooltip tidak tertindih oleh thead */
+/* @media only screen and (min-width: 640px) {
+    .dt-scroll-body {
+        overflow: visible !important;
+    }
+} */
+
+/* choices.js */
+.choices {
+    margin-bottom: 0 !important;
+}
+
+/* Sembunyikan input search choices.js saat mode detail */
+[data-show-mode="true"] .choices__input,
+[data-show-mode="true"] .choices__input--cloned,
+[data-show-mode="true"] .choices__button {
+    display: none !important;
+}

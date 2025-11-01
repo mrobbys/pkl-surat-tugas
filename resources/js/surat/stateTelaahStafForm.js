@@ -1,0 +1,21 @@
+export const stateTelaahStafForm = {
+  mode: 'create',
+  loading: false,
+  suratId: null,
+  form: {
+    kepada_yth: '',
+    dari: '',
+    nomor_telaahan: '',
+    tanggal_telaahan: '',
+    perihal_kegiatan: '',
+    tempat_pelaksanaan: '',
+    tanggal_mulai: '',
+    tanggal_selesai: '',
+    dasar_telaahan: '',
+    isi_telaahan: '',
+    pegawais: [],
+  },
+  errors: {},
+  pegawaisData: [],
+  pegawaisChoices: null,
+}
