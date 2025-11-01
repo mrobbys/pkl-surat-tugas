@@ -5,7 +5,7 @@
             <img src="{{ asset('assets/diskominfo-bjb.png') }}"
                 alt="logo diskominfo bjb"
                 class="h-18 mb-8 w-auto transition duration-300 hover:scale-105 hover:drop-shadow-2xl" />
-            <h1 class="text-2xl font-bold text-gray-800 mb-1">Surat Tugas Lapangan</h1>
+            <h1 class="mb-1 text-2xl font-bold text-gray-800">Surat Tugas Lapangan</h1>
             <p class="text-sm text-gray-500">Masuk ke akun Anda untuk melanjutkan</p>
         </div>
 
@@ -39,8 +39,7 @@
             method="POST"
             action="{{ route('login.store') }}"
             x-on:submit="loading = true"
-            x-init="email = '{{ old('email', '') }}'"
-            >
+            x-init="email = '{{ old('email', '') }}'">
             @csrf
             {{-- Input Email Start --}}
             <div class="flex w-full flex-col gap-1 text-neutral-600">
@@ -82,10 +81,10 @@
                         class="text-on-surface absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer"
                         aria-label="Show password">
                         <i x-show="!showPassword"
-                            class="ri-eye-line ri-lg"></i>
+                            class="ri-eye-off-line ri-lg"></i>
                         <i x-cloak
                             x-show="showPassword"
-                            class="ri-eye-off-line ri-lg"></i>
+                            class="ri-eye-line ri-lg"></i>
                     </button>
                 </div>
                 {{-- pesan error validasi dari js start --}}
@@ -112,7 +111,7 @@
                         id="remember"
                         name="remember"
                         value="1"
-                        class="w-4 h-4 cursor-pointer" />
+                        class="h-4 w-4 cursor-pointer" />
                     <label for="remember"
                         class="ml-2 block cursor-pointer select-none text-sm text-gray-700">
                         Ingat Saya
@@ -124,7 +123,7 @@
             {{-- Button Submit Start --}}
             <div>
                 <button x-cloak
-                :disabled="!isFormValid() || loading"
+                    :disabled="!isFormValid() || loading"
                     type="submit"
                     class="w-full rounded-lg px-3 py-2"
                     x-bind:class="{
@@ -159,7 +158,7 @@
         {{-- Form Login End --}}
 
         <hr class="mt-6 border-gray-200" />
-        <p class="text-center text-sm text-gray-500 mt-4">&copy; 2025 Diskominfo Kota Banjarbaru</p>
-        
+        <p class="mt-4 text-center text-sm text-gray-500">&copy; 2025 Diskominfo Kota Banjarbaru</p>
+
     </div>
 </x-layouts.auth-layout>

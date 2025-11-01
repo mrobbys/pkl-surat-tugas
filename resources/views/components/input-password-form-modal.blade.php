@@ -44,10 +44,10 @@
             class="text-on-surface absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer"
             aria-label="Show password">
             <i x-show="!showPassword"
-                class="ri-eye-line ri-lg"></i>
+                class="ri-eye-off-line ri-lg"></i>
             <i x-cloak
                 x-show="showPassword"
-                class="ri-eye-off-line ri-lg"></i>
+                class="ri-eye-line ri-lg"></i>
         </button>
     </div>
     <div x-show="errors.{{ $name }}"
