@@ -120,21 +120,29 @@ export const telaahStafFormMethods = {
     }
 
     // tentukan URL dan method berdasarkan mode
-    const url = this.mode === 'create'
-      ? this.config.storeUrl
-      : this.config.updateUrl.replace('__ID__', this.suratId);
-
-    const method = this.mode === 'create' ? 'POST' : 'PUT';
+    const isUpdate = !!this.editingId;
+    const url = isUpdate
+      ? this.config.updateUrl.replace('__ID__', this.editingId)
+      : this.config.storeUrl;
 
     try {
+      const payload = {
+        ...this.form,
+      };
+      
+      // tentukan method berdasarkan create atau update
+      if(isUpdate) {
+        payload._method = 'PUT';
+      }
+      
       const response = await fetch(url, {
-        method: method,
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': this.csrfToken,
           'X-Requested-With': 'XMLHttpRequest',
         },
-        body: JSON.stringify(this.form),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();

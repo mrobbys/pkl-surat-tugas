@@ -7,23 +7,27 @@ export const storeUpdateMethods = {
 
     this.loading = true;
 
-    let payload = { ...this.form };
-    if (this.editingId) {
-      // Untuk update, hanya kirim password jika diisi
-      if (!payload.password || payload.password.trim() === '') {
-        delete payload.password;
-      }
-    }
-
     // menentukan url dan method apakah create atau update
-    const url = this.editingId
+    const isUpdate = !!this.editingId;
+    const url = isUpdate
       ? this.config.updateUrl.replace('__ID__', this.editingId)
       : this.config.storeUrl;
-    const method = this.editingId ? 'PUT' : 'POST';
+
 
     try {
+
+      const payload = { ...this.form };
+
+      // Untuk update, hanya kirim password jika diisi
+      if (isUpdate) {
+        if (!payload.password || payload.password.trim() === '') {
+          delete payload.password; // Hapus password jika kosong
+        }
+        payload._method = 'PUT';
+      }
+
       const response = await fetch(url, {
-        method: method,
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': this.csrfToken,
@@ -60,7 +64,7 @@ export const storeUpdateMethods = {
             text:
               data.text ||
               data.message ||
-              'Terjadi kesalahan saat menyimpan data.',
+              'Terjadi kesalahan saat submit form.',
             timer: 5000,
           });
         }
@@ -71,7 +75,7 @@ export const storeUpdateMethods = {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Terjadi kesalahan saat menyimpan data user.',
+        text: 'Terjadi kesalahan saat submit form.',
         timer: 5000,
       });
     } finally {

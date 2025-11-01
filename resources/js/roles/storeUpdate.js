@@ -15,10 +15,10 @@ export const storeUpdateMethods = {
 
     try {
       const payload = {
-        ...this.form, // Spread semua field dari this.form
+        ...this.form,
       };
 
-      // Method spoofing untuk update (PUT -> POST)
+      // tentukan method berdasarkan create atau update
       if (isUpdate) {
         payload._method = 'PUT';
       }
