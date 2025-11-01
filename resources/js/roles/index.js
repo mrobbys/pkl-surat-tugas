@@ -88,6 +88,7 @@ export const indexMethods = {
           theme: 'light',
           trigger: 'mouseenter',
           hideOnClick: true,
+          touch: false,
         });
       }
     });
