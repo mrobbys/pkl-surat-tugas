@@ -1,7 +1,7 @@
 function loginManager() {
   return {
     loading: false,
-    email: '{{ old("email", "") }}',
+    email: '',
     password: '',
 
     // email & password dibawah ini hanya untuk testing

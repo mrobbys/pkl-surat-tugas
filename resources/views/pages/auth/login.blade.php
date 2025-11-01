@@ -38,7 +38,9 @@
         <form class="space-y-4"
             method="POST"
             action="{{ route('login.store') }}"
-            x-on:submit="loading = true">
+            x-on:submit="loading = true"
+            x-init="email = '{{ old('email', '') }}'"
+            >
             @csrf
             {{-- Input Email Start --}}
             <div class="flex w-full flex-col gap-1 text-neutral-600">
