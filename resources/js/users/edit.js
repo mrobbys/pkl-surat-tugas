@@ -29,7 +29,11 @@ export const editMethods = {
         // Fetch data setelah choices diinisialisasi
         await this.fetchPangkatGolonganAndRoles();
 
-        this.$refs.nipInput.focus();
+        // Cek apakah bukan touch device
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        if (!isTouchDevice) {
+          this.$refs.nipInput.focus();
+        }
 
         setTimeout(() => {
           this.setChoicesSelectedValues();

@@ -4,8 +4,11 @@ export const telaahStafFormMethods = {
       this.initChoices();
       this.initCKEditor();
 
+      // Cek apakah bukan touch device
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      
       // focus input pertama jika bukan show
-      if (this.mode !== 'show' && this.$refs.kepada_ythInput) {
+      if (this.mode !== 'show' && this.$refs.kepada_ythInput && !isTouchDevice) {
         this.$refs.kepada_ythInput.focus();
       }
     });

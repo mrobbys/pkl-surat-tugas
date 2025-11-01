@@ -5,7 +5,11 @@ export const createMethods = {
     this.textSubmit = 'Simpan';
 
     this.$nextTick(() => {
-      this.$refs.pangkatInput.focus();
+      // Cek apakah bukan touch device
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      if (!isTouchDevice) {
+        this.$refs.pangkatInput.focus();
+      }
 
       setTimeout(() => {
         this.validateForm('pangkat');

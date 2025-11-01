@@ -10,13 +10,12 @@ export const createMethods = {
 
       // Cek apakah bukan touch device
       const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      if (!isTouchDevice) {
+        this.$refs.nameInput.focus();
+      }
 
-      this.$nextTick(() => {
-        // Focus hanya di desktop
-        if (!isTouchDevice) {
-          this.$refs.nameInput.focus();
-        }
-
+      // validasi form
+      setTimeout(() => {
         this.validateForm('name');
         this.validateForm('permissions');
       });

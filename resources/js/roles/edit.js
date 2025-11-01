@@ -1,7 +1,7 @@
 export const editMethods = {
   async editRole(id) {
     try {
-      const response  = await fetch(this.config.editUrl.replace('__ID__', id) );
+      const response = await fetch(this.config.editUrl.replace('__ID__', id));
       const data = await response.json();
 
       this.modalTitle = `Edit Role : ${data.data.name}`;
@@ -20,7 +20,11 @@ export const editMethods = {
       this.$nextTick(async () => {
         await this.fetchPermissions();
 
-        this.$refs.nameInput.focus();
+        // Cek apakah bukan touch device
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        if (!isTouchDevice) {
+          this.$refs.nameInput.focus();
+        }
       });
     } catch (error) {
       console.error('Error fetching role data:', error);

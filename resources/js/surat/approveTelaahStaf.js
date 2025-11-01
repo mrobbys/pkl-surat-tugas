@@ -15,7 +15,11 @@ export const approveTelaahStaf = {
     this.showApproveModal = true;
 
     this.$nextTick(() => {
-      this.$refs.status.focus();
+      // Cek apakah bukan touch device
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      if (!isTouchDevice) {
+        this.$refs.status.focus();
+      }
     });
   },
 

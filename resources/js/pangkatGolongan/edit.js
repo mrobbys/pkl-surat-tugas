@@ -26,7 +26,12 @@ export const editMethods = {
       this.showModal = true;
 
       this.$nextTick(() => {
-        this.$refs.pangkatInput.focus();
+        // Cek apakah bukan touch device
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        if (!isTouchDevice) {
+          this.$refs.pangkatInput.focus();
+        }
+
       });
     } catch (error) {
       console.error('Error:', error);
