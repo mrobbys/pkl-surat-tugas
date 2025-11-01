@@ -26,6 +26,7 @@ export const storeUpdateMethods = {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           'X-CSRF-TOKEN': this.csrfToken,
           'X-Requested-With': 'XMLHttpRequest',
         },
