@@ -53,6 +53,7 @@ function userManager(config) {
           noResultsText: 'Tidak ada hasil',
           noChoicesText: 'Tidak ada pilihan',
           itemSelectText: 'Klik untuk memilih',
+          shouldSort: false,
           classNames: {
             containerOuter: ['choices'],
             containerInner: ['choices__inner'],
@@ -81,6 +82,7 @@ function userManager(config) {
           placeholderValue: 'Pilih Pangkat Golongan',
           noChoicesText: 'Tidak ada pilihan',
           noResultsText: 'Tidak ada hasil',
+          shouldSort: false,
           classNames: {
             containerOuter: ['choices', 'custom-choices-container'],
           },
