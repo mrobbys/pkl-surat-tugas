@@ -14,7 +14,6 @@
 /.zed
 /auth.json
 /node_modules
-/public/build
 /public/hot
 /public/storage
 /storage/*.key
@@ -48,7 +47,6 @@ Homestead.json
 /.vagrant
 .phpunit.result.cache
 
-/public/build
 /storage/pail
 .env.backup
 .env.production
