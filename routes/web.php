@@ -27,13 +27,13 @@ Route::middleware(['auth'])->group(function () {
   // index
   Route::get('/surat', [SuratPerjalananDinasController::class, 'indexSurat'])->middleware(['can:view telaah staf'])->name('surat.index');
   // create telaah staf
-  Route::get('/surat/telaah-staf/create', [SuratPerjalananDinasController::class, 'createTelaahStaf'])->name('telaah-staf.create');
+  Route::get('/surat/telaah-staf/create', [SuratPerjalananDinasController::class, 'createTelaahStaf'])->middleware(['can:create telaah staf'])->name('telaah-staf.create');
   // store telaah staf
   Route::post('/telaah-staf', [SuratPerjalananDinasController::class, 'storeTelaahStaf'])->name('telaah-staf.store');
   // show telaah staf
   Route::get('/surat/telaah-staf/{surat}', [SuratPerjalananDinasController::class, 'showTelaahStaf'])->name('telaah-staf.show');
   // edit telaah staf
-  Route::get('/surat/telaah-staf/{surat}/edit', [SuratPerjalananDinasController::class, 'editTelaahStaf'])->name('telaah-staf.edit');
+  Route::get('/surat/telaah-staf/{surat}/edit', [SuratPerjalananDinasController::class, 'editTelaahStaf'])->middleware(['can:edit telaah staf'])->name('telaah-staf.edit');
   // update telaah staf
   Route::put('/telaah-staf/{surat}', [SuratPerjalananDinasController::class, 'updateTelaahStaf'])->name('telaah-staf.update');
   // destroy
