@@ -4,6 +4,10 @@ function loginManager() {
     email: '{{ old("email", "") }}',
     password: '',
 
+    // email & password dibawah ini hanya untuk testing
+    // email: 'superadmin@gmail.com',
+    // password: 'Password1.',
+
     showPassword: false,
     errors: {},
 
