@@ -88,7 +88,7 @@
         {{-- nomor surat nota dinas end --}}
 
         <table
-            style="width: 100%; border-collapse: collapse; line-height: 150%; margin-top:40px; text-align: justify;">
+            style="width: 100%; border-collapse: collapse; line-height: 1.5; margin-top:40px; text-align: justify;">
             <tr>
                 <td style="width: 120px; vertical-align: top">Yth.</td>
                 <td style="width: 15px; vertical-align: top">:</td>
@@ -103,7 +103,7 @@
                 <td style="vertical-align: top">Tanggal</td>
                 <td style="vertical-align: top">:</td>
                 <td style="vertical-align: top">
-                    {{ \Carbon\Carbon::parse($surat->tanggal_telaahan)->translatedFormat('d F Y') }}
+                    {{ \Carbon\Carbon::parse($surat->tanggal_telaahan)->translatedFormat('j F Y') }}
                 </td>
             </tr>
             <tr>

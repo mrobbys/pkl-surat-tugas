@@ -16,7 +16,6 @@
         placeholder="Juru Muda, Pengatur Muda, Pembina"
         x-model="form.pangkat"
         x-ref="pangkatInput"
-        @input="validateForm('pangkat')"
         maxlength="100"
     />
 
@@ -29,9 +28,6 @@
         name="golongan"
         placeholder="I, II, III, IV"
         x-model="form.golongan"
-        @input="validateForm('golongan')"
-        pattern="^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$"
-        x-on:input="form.golongan = form.golongan.replace(/[^ivxlcdmIVXLCDM]/g, '')"
     />
     {{-- input golongan end --}}
 
@@ -42,8 +38,6 @@
         name="ruang"
         placeholder="a, b, c, d"
         x-model="form.ruang"
-        @input="validateForm('ruang')"
-        x-on:input="form.ruang = form.ruang.replace(/[^a-z]/g, '')"
         maxlength="1"
     />
     {{-- input ruang end --}}

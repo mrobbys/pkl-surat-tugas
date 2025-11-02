@@ -22,16 +22,16 @@ class StoreTelaahStafRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'kepada_yth' => 'required|string|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|min:3|max:255',
-            'dari' => 'required|string|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|min:3|max:255',
-            'nomor_telaahan' => 'required|string|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|min:3|max:100',
+            'kepada_yth' => 'required|string|min:3|max:255',
+            'dari' => 'required|string|min:3|max:255',
+            'nomor_telaahan' => 'required|string|min:3|max:100',
             'tanggal_telaahan' => 'required|date',
-            'perihal_kegiatan' => 'required|string|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|min:3',
-            'tempat_pelaksanaan' => 'required|string|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|min:3|max:255',
+            'perihal_kegiatan' => 'required|string|min:3',
+            'tempat_pelaksanaan' => 'required|string|min:3|max:255',
             'tanggal_mulai' => 'required|date|before_or_equal:tanggal_selesai',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
-            'dasar_telaahan' => 'required|string|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|min:10',
-            'isi_telaahan' => 'required|string|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|min:10',
+            'dasar_telaahan' => 'required|string|min:10',
+            'isi_telaahan' => 'required|string|min:10',
             'pegawais' => 'required|array|min:1|exists:users,id',
         ];
     }
@@ -86,8 +86,6 @@ class StoreTelaahStafRequest extends FormRequest
             'pegawais.array' => 'Pegawai harus berupa array.',
             'pegawais.min' => 'Pilih minimal 1 pegawai.',
             'pegawais.exists' => 'Pegawai yang dipilih tidak valid.',
-            
-            'not_regex' => 'Input mengandung karakter terlarang.',
         ];
     }
 }

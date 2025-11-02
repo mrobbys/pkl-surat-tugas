@@ -23,9 +23,9 @@ class UpdatePangkatGolonganRequest extends FormRequest
     {
         $id = $this->pangkat_golongan?->id ?? null;
         return [
-            'pangkat' => 'required|string|min:3|max:100|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|unique:pangkat_golongans,pangkat,' . $id,
-            'golongan' => ['required', 'string', 'min:1', 'regex:/^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/i', 'not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i'],
-            'ruang' => 'required|string|max:1|regex:/^[a-z]+$/|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i',
+            'pangkat' => 'required|string|min:3|max:100|unique:pangkat_golongans,pangkat,' . $id,
+            'golongan' => ['required', 'string', 'min:1', 'regex:/^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/i'],
+            'ruang' => 'required|string|max:1|regex:/^[a-z]+$/',
         ];
     }
 
@@ -46,9 +46,7 @@ class UpdatePangkatGolonganRequest extends FormRequest
             'ruang.required' => 'Ruang harus diisi.',
             'ruang.string' => 'Ruang harus berupa string.',
             'ruang.max' => 'Ruang tidak boleh lebih dari 1 karakter.',
-            'ruang.regex' => 'Ruang harus berupa huruf kecil (a, b, c, d, dst).',
-
-            'not_regex' => 'Input mengandung karakter terlarang.',
+            'ruang.regex' => 'Ruang harus berupa huruf kecil (a, b, c, d).',
         ];
     }
 }

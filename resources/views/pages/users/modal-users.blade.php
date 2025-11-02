@@ -19,7 +19,6 @@
             placeholder="Masukkan NIP"
             x-model="form.nip"
             x-ref="nipInput"
-            @input="validateForm('nip')"
             x-on:input="form.nip = form.nip.replace(/[^0-9]/g, '').slice(0, 18)"
             isShowMode="!isShowMode"
             pattern="\d{18}"
@@ -35,7 +34,6 @@
             name="nama_lengkap"
             placeholder="Masukkan Nama Lengkap"
             x-model="form.nama_lengkap"
-            @input="validateForm('nama_lengkap')"
             x-on:input="form.nama_lengkap = form.nama_lengkap.replace(/[^a-zA-Z\s.,]/g, '')"
             isShowMode="!isShowMode"
             x-bind:disabled="isShowMode" />
@@ -48,7 +46,6 @@
             type="email"
             placeholder="Masukkan Email"
             x-model="form.email"
-            @input="validateForm('email')"
             isShowMode="!isShowMode"
             x-bind:disabled="isShowMode" />
         {{-- input email end --}}
@@ -60,8 +57,7 @@
             placeholder="Masukkan Password"
             x-model="form.password"
             isShowMode="!isShowMode"
-            x-bind:disabled="isShowMode"
-            @input="validateForm('password')" />
+            x-bind:disabled="isShowMode" />
         {{-- input password end --}}
 
         {{-- input roles start --}}
@@ -69,8 +65,7 @@
             label="Roles"
             isShowMode="!isShowMode"
             nameError="roles">
-            <select @input="validateForm('roles')"
-                id="roles-select"
+            <select id="roles-select"
                 name="roles[]"
                 multiple
                 class="w-full"
@@ -85,8 +80,7 @@
             label="Pangkat Golongan/Ruang"
             isShowMode="!isShowMode"
             nameError="pangkat_golongan_id">
-            <select @input="validateForm('pangkat_golongan_id')"
-                id="pangkatGolongan-select"
+            <select id="pangkatGolongan-select"
                 name="pangkat_golongan_id"
                 class="w-full"
                 :disabled="isShowMode">
@@ -99,7 +93,6 @@
             name="jabatan"
             placeholder="Masukkan Jabatan"
             x-model="form.jabatan"
-            @input="validateForm('jabatan')"
             isShowMode="!isShowMode"
             x-bind:disabled="isShowMode" />
     </div>

@@ -20,7 +20,7 @@
     "src": "node_modules/remixicon/fonts/remixicon.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-B7pBgJL8.css",
+    "file": "assets/app-CDhtaCah.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "names": [
@@ -28,7 +28,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-Q9McgXMQ.js",
+    "file": "assets/app-B9neCItg.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

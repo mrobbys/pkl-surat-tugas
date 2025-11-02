@@ -82,21 +82,7 @@ div.dt-container .dt-search input {
     }
 }
 
-/* styling untuk tooltip tidak tertindih oleh thead */
-/* @media only screen and (min-width: 640px) {
-    .dt-scroll-body {
-        overflow: visible !important;
-    }
-} */
-
 /* choices.js */
 .choices {
     margin-bottom: 0 !important;
-}
-
-/* Sembunyikan input search choices.js saat mode detail */
-[data-show-mode="true"] .choices__input,
-[data-show-mode="true"] .choices__input--cloned,
-[data-show-mode="true"] .choices__button {
-    display: none !important;
 }

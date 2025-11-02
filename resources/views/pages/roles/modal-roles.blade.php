@@ -18,7 +18,6 @@
         placeholder="kabid, kabag-kepegawaian, kadis"
         x-model="form.name"
         x-ref="nameInput"
-        @input="validateForm('name')"
         x-bind:disabled="isShowMode"
     />
 

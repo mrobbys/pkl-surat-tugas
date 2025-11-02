@@ -1,3 +1,5 @@
+import { initTippy } from '../utils/tippyInit.js'
+
 export const indexMethods = {
   fetchPangkatGolongans() {
     const self = this;
@@ -78,16 +80,7 @@ export const indexMethods = {
       ],
       // Callback setelah DataTable selesai draw
       drawCallback: function () {
-        // Initialize Tippy.js untuk semua button
-        tippy('[data-tippy-content]', {
-          placement: 'left-start',
-          arrow: true,
-          theme: 'light',
-          allowHTML: true,
-          trigger: 'mouseenter',
-          hideOnClick: true,
-          touch: false,
-        });
+        initTippy();
       }
     });
 

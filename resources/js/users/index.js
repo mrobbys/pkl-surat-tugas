@@ -1,3 +1,6 @@
+import { maskNIP, maskEmail } from '../utils/dataMasking.js'
+import { initTippy } from '../utils/tippyInit.js'
+
 export const indexMethods = {
   fetchUsers() {
     const self = this;
@@ -26,11 +29,7 @@ export const indexMethods = {
         data: 'nip',
         name: 'nip',
         render: function (data, type, row) {
-          // untuk nip hanya tampil 4 digit terakhir
-          if (!data) return '';
-          const last4 = data.slice(-4);
-          const masked = '*'.repeat(data.length - 4) + last4;
-          return masked;
+          return maskNIP(data);
         },
       },
       {
@@ -41,12 +40,7 @@ export const indexMethods = {
         data: 'email',
         name: 'email',
         render: function (data, type, row) {
-          if (!data) return '';
-          const [user, domain] = data.split('@');
-          if (user.length <= 2) {
-            return user[0] + '***@' + domain;
-          }
-          return user.slice(0, 2) + '***@' + domain;
+          return maskEmail(data);
         },
       },
       {
@@ -113,16 +107,7 @@ export const indexMethods = {
       ],
       // Callback setelah DataTable selesai draw
       drawCallback: function () {
-        // Initialize Tippy.js untuk semua button
-        tippy('[data-tippy-content]', {
-          placement: 'left-start',
-          arrow: true,
-          theme: 'light',
-          allowHTML: true,
-          trigger: 'mouseenter',
-          hideOnClick: true,
-          touch: false,
-        });
+        initTippy();
       }
     });
 

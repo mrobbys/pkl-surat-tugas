@@ -28,7 +28,6 @@ class StoreRoleRequest extends FormRequest
                 'min:3',
                 'unique:roles,name',
                 'regex:/^[a-z0-9]+(-[a-z0-9]+)*$/',
-                'not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i'
             ],
             'permissions' => 'required|min:1|array'
         ];
@@ -46,8 +45,6 @@ class StoreRoleRequest extends FormRequest
             'permissions.required' => 'Permission harus dipilih minimal 1.',
             'permissions.min' => 'Permission harus dipilih minimal 1.',
             'permissions.array' => 'Permission harus berupa array.',
-
-            'not_regex' => 'Input mengandung karakter terlarang.',
         ];
     }
 }

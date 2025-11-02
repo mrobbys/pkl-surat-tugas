@@ -1,9 +1,5 @@
 export const storeUpdateMethods = {
   async saveRole() {
-    // Validasi semua field sebelum submit
-    const fields = ['name', 'permissions'];
-    fields.forEach((f) => this.validateForm(f));
-    if (!this.isFormValid()) return;
 
     this.loading = true;
 

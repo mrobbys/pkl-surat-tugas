@@ -9,31 +9,6 @@
             <p class="text-sm text-gray-500">Masuk ke akun Anda untuk melanjutkan</p>
         </div>
 
-        {{-- pesan error dari backend start --}}
-        @if ($errors->has('email') || $errors->has('password'))
-            <div
-                class="my-4 flex flex-col items-start justify-center gap-3 rounded-md bg-red-100 p-2">
-                <ul class="list-inside list-disc">
-                    {{-- pesan error email start --}}
-                    @error('email')
-                        <li class="text-sm text-red-500">{{ $message }}</li>
-                    @enderror
-
-                    {{-- pesan error email end --}}
-
-                    {{-- pesan error password start --}}
-                    @if ($errors->has('password') && is_array($errors->get('password')))
-                        @foreach ($errors->get('password') as $msg)
-                            <li class="text-sm text-red-500">{{ $msg }}</li>
-                        @endforeach
-                    @endif
-
-                    {{-- pesan error password end --}}
-                </ul>
-            </div>
-        @endif
-        {{-- pesan error dari backend end --}}
-
         {{-- Form Login Start --}}
         <form class="space-y-4"
             method="POST"
@@ -47,17 +22,15 @@
                     class="w-fit pl-0.5 text-sm">Email</label>
                 <input id="email"
                     type="email"
-                    class="{{ $errors->has('email') ? 'border border-red-500' : 'border border-neutral-300' }} w-full rounded-sm bg-neutral-100 px-2 py-3 text-sm transition duration-300 focus:outline-none focus:ring-0"
-                    :class="errors.email ? 'border border-red-500' : 'focus:border focus:border-blue-500'"
+                    class="{{ $errors->has('email') ? 'border-red-500' : 'border-neutral-300 focus:border-blue-500' }} w-full rounded-sm border bg-neutral-100 px-2 py-3 text-sm transition duration-300 focus:outline-none focus:ring-0"
                     name="email"
                     placeholder="nama@gmail.com"
                     autocomplete="off"
                     x-model="email"
-                    @input="validateForm('email')" />
-                {{-- pesan error validasi dari js start --}}
-                <small class="text-red-500"
-                    x-text="errors.email"></small>
-                {{-- pesan error validasi dari js end --}}
+                    />
+                @error('email')
+                    <small class="text-red-500">{{ $message }}</small>
+                @enderror
             </div>
             {{-- Input Email End --}}
 
@@ -69,13 +42,10 @@
                     <input id="password"
                         x-model="password"
                         :type="showPassword ? 'text' : 'password'"
-                        class="{{ $errors->has('password') ? 'border border-red-500' : 'border border-neutral-300' }} w-full rounded-sm bg-neutral-100 px-2 py-3 text-sm transition duration-300 focus:outline-none focus:ring-0"
-                        :class="errors.password ? 'border border-red-500' :
-                            'focus:border focus:border-blue-500'"
+                        class="{{ $errors->has('password') ? 'border-red-500' : 'border-neutral-300 focus:border-blue-500' }} w-full rounded-sm border bg-neutral-100 px-2 py-3 text-sm transition duration-300 focus:outline-none focus:ring-0"
                         name="password"
                         autocomplete="off"
-                        placeholder="••••••••"
-                        @input="validateForm('password')" />
+                        placeholder="••••••••" />
                     <button type="button"
                         @click="showPassword = !showPassword"
                         class="text-on-surface absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer"
@@ -87,20 +57,16 @@
                             class="ri-eye-line ri-lg"></i>
                     </button>
                 </div>
-                {{-- pesan error validasi dari js start --}}
-                <div x-show="errors.password"
-                    class="flex flex-col items-start">
-                    <template x-if="Array.isArray(errors.password)">
+
+                @if ($errors->has('password') && is_array($errors->get('password')))
+                    <div class="flex flex-col items-start">
                         <ul class="list-inside list-disc">
-                            <template x-for="msg in errors.password"
-                                :key="msg">
-                                <li x-text="msg"
-                                    class="text-sm text-red-500"></li>
-                            </template>
+                            @foreach ($errors->get('password') as $msg)
+                                <li class="text-sm text-red-500">{{ $msg }}</li>
+                            @endforeach
                         </ul>
-                    </template>
-                </div>
-                {{-- pesan error validasi dari js end --}}
+                    </div>
+                @endif
             </div>
             {{-- Input Password End --}}
 

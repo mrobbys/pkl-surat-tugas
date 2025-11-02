@@ -35,10 +35,14 @@
                 'name' => $name,
                 'type' => 'password',
                 'placeholder' => $placeholder,
-                'class' => 'w-full border border-neutral-300 bg-neutral-50 rounded-sm px-2 py-3 text-sm',
                 'autocomplete' => 'off',
             ]) }}
-            :type="showPassword ? 'text' : 'password'" />
+            :type="showPassword ? 'text' : 'password'" 
+            :class="errors.{{ $name }} ? 
+                'border-red-500 ' : 
+                'border-neutral-300 focus:border-blue-500'"
+            class="w-full bg-neutral-100 border rounded-sm px-2 py-3 pr-10 text-sm transition duration-300 focus:outline-none focus:ring-0" 
+            />
         <button type="button"
             @click="showPassword = !showPassword"
             class="text-on-surface absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer"

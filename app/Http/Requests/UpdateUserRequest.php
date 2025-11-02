@@ -24,13 +24,13 @@ class UpdateUserRequest extends FormRequest
     {
         $id = $this->user?->id ?? null;
         return [
-            'nip' => 'required|digits:18|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|unique:users,nip,' . $id,
-            'nama_lengkap' => 'required|string|min:3|max:255|regex:/^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s.,\'"-]*[A-Za-zÀ-ÿ.,]$/u|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i',
-            'email' => 'required|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i|email:dns|unique:users,email,' . $id,
-            'password' => ['nullable', 'string', 'not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i', Password::min(8)->mixedCase()->numbers()->symbols()],
-            'roles' => 'required|array|min:1|max:5|exists:roles,id',
+            'nip' => 'required|digits:18|unique:users,nip,' . $id,
+            'nama_lengkap' => 'required|string|regex:/^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s.,\'"-]*[A-Za-zÀ-ÿ.,]$/u|min:3|max:255',
+            'email' => 'required|email:dns|unique:users,email,' . $id,
+            'password' => ['nullable', 'string', Password::min(8)->max(100)->mixedCase()->numbers()->symbols()],
+            'roles' => 'required|array|min:1|exists:roles,id',
             'pangkat_golongan_id' => 'required|exists:pangkat_golongans,id',
-            'jabatan' => 'required|string|min:3|max:255|regex:/^[a-zA-Z\s]+$/|not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i',
+            'jabatan' => 'required|string|min:3|max:255|regex:/^[a-zA-Z\s]+$/',
         ];
     }
 
@@ -54,6 +54,7 @@ class UpdateUserRequest extends FormRequest
 
             'password.string' => 'Password harus berupa string.',
             'password.min' => 'Password harus terdiri dari minimal 8 karakter.',
+            'password.max' => 'Password tidak boleh lebih dari 100 karakter.',
             'password.mixed' => 'Password harus mengandung huruf besar dan kecil.',
             'password.numbers' => 'Password harus mengandung angka.',
             'password.symbols' => 'Password harus mengandung simbol.',
@@ -61,7 +62,6 @@ class UpdateUserRequest extends FormRequest
             'roles.required' => 'Role wajib dipilih.',
             'roles.array' => 'Role harus berupa array.',
             'roles.min' => 'Pilih minimal 1 role.',
-            'roles.max' => 'Pilih maksimal 5 role.',
             'roles.exists' => 'Role yang dipilih tidak valid.',
 
             'pangkat_golongan_id.required' => 'Pangkat/Golongan wajib dipilih.',
@@ -72,8 +72,6 @@ class UpdateUserRequest extends FormRequest
             'jabatan.min' => 'Jabatan harus terdiri dari minimal 3 karakter.',
             'jabatan.max' => 'Jabatan tidak boleh lebih dari 255 karakter.',
             'jabatan.regex' => 'Jabatan hanya boleh berisi huruf dan spasi.',
-
-            'not_regex' => 'Input mengandung karakter terlarang.',
         ];
     }
 }

@@ -1,3 +1,5 @@
+import { focusIfNotTouch } from '../utils/touchDeviceDetection.js'
+
 export const createMethods = {
   openCreateModal() {
     this.showModal = true;
@@ -6,16 +8,7 @@ export const createMethods = {
 
     this.$nextTick(() => {
       // Cek apakah bukan touch device
-      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      if (!isTouchDevice) {
-        this.$refs.pangkatInput.focus();
-      }
-
-      setTimeout(() => {
-        this.validateForm('pangkat');
-        this.validateForm('golongan');
-        this.validateForm('ruang');
-      });
+      focusIfNotTouch(this.$refs.pangkatInput);
     });
   },
 }

@@ -7,7 +7,6 @@
     'type' => 'text',
     'placeholder' => '',
     'isShowMode' => null,
-    'mode' => null,
 ])
 
 {{--
@@ -20,7 +19,6 @@
     - type (opsional): tipe input, default 'text'.
     - placeholder (opsional): placeholder untuk input, default ''.
     - isShowMode (opsional): untuk menampilkan tanda * pada label jika dalam mode create/edit.
-    - mode (opsional): mode untuk input form, bisa 'show' untuk menonaktifkan input. Penggunaan utamanya digunakan untuk bagian detail/show surat telaah staf.
 --}}
 
 <div class="{{ $divClass }} flex w-full flex-col gap-1 text-neutral-600">
@@ -43,11 +41,11 @@
             'placeholder' => $placeholder,
             'autocomplete' => 'off',
         ]) }}
-        @class([
-            'w-full rounded-sm border border-neutral-300 px-2 py-3 text-sm',
-            'bg-neutral-50' => !$mode || $mode !== 'show',
-            'bg-[#eaeaea] cursor-not-allowed' => $mode === 'show',
-        ]) />
+        :class="errors.{{ $name }} ? 
+            'border-red-500' : 
+            'border-neutral-300 focus:border-blue-500'"
+        class="w-full bg-neutral-100 rounded-sm border px-2 py-3 text-sm transition duration-300 focus:outline-none focus:ring-0" 
+        />
     <small class="text-red-500"
         x-show="errors.{{ $name }}"
         x-text="errors.{{ $name }}"></small>

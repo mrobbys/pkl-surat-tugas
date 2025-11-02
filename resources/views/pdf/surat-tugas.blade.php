@@ -90,97 +90,100 @@
         </p>
         {{-- nomor surat tugas end --}}
 
-        <table style="margin-top: 40px; width: 100%; border-collapse: collapse; line-height: 150%">
-            {{-- dasar surat tugas start --}}
+                {{-- dasar surat tugas start --}}
+        <table style="margin-top: 40px; width: 100%; border-collapse: collapse;">
             <tr>
-                <td style="width: 25%; vertical-align: top; padding-bottom: 20px;">Dasar</td>
-                <td style="width: 15px; vertical-align: top; padding-bottom: 20px;">:</td>
-                <td style="vertical-align: top; text-align: justify; padding-bottom: 20px;">
+                <td style="width: 25%; vertical-align: top; line-height: 1.6;">Dasar</td>
+                <td style="width: 20px; vertical-align: top; line-height: 1.6;">:</td>
+                <td style="vertical-align: top; text-align: justify; line-height: 1.6;">
                     Persetujuan KEPALA DINAS
                     KOMUNIKASI DAN INFORMATIKA Kota Banjarbaru atas Telaahan Staf Nomor
                     {{ $surat->nomor_telaahan }} tanggal
-                    {{ \Carbon\Carbon::parse($surat->tanggal_telaahan)->translatedFormat('d F Y') }},
+                    {{ \Carbon\Carbon::parse($surat->tanggal_telaahan)->translatedFormat('j F Y') }},
                     Perihal
                     {{ $surat->perihal_kegiatan }}</td>
             </tr>
-            {{-- dasar surat tugas end --}}
+        </table>
+        {{-- dasar surat tugas end --}}
 
-            {{-- kepada surat tugas start --}}
-            <tr>
-                <td style="width: 25%; vertical-align: top; padding-bottom: 20px;">Kepada</td>
-                <td style="width: 15px; vertical-align: top; padding-bottom: 20px;">:</td>
-                <td style="vertical-align: top; text-align: justify; padding-bottom: 20px;">
-                    @foreach ($surat->pegawaiDitugaskan as $index => $pegawai)
-                        <table style="width: 100%; margin-bottom: 15px;">
+        {{-- kepada surat tugas start --}}
+        @foreach ($surat->pegawaiDitugaskan as $index => $pegawai)
+            <table style="width: 100%; margin-top: 15px; margin-bottom: 8px; page-break-inside: avoid;">
+                <tr>
+                    <td style="width: 25%; vertical-align: top; line-height: 1.5;">
+                        @if ($index === 0)
+                            Kepada
+                        @endif
+                    </td>
+                    <td style="width: 15px; vertical-align: top; line-height: 1.5;">
+                        @if ($index === 0)
+                            :
+                        @endif
+                    </td>
+                    <td style="width: 30px; vertical-align: top; line-height: 1.4;">
+                        {{ $index + 1 }}.
+                    </td>
+                    <td style="vertical-align: top;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 11pt;">
                             <tr>
-                                <td style="width: 25px; vertical-align: top;">{{ $index + 1 }}.
-                                </td>
-                                <td style="vertical-align: top;">
-                                    <table style="width: 100%; border-collapse: collapse;">
-                                        <tr>
-                                            <td style="width: 120px; padding: 2px 0;">Nama</td>
-                                            <td style="width: 10px; padding: 2px 0;">:</td>
-                                            <td style="padding: 2px 0;">
-                                                {{ $pegawai->nama_lengkap ?? '-' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 2px 0;">Pangkat/Gol</td>
-                                            <td style="padding: 2px 0;">:</td>
-                                            <td style="padding: 2px 0;">
-                                                {{ $pegawai->pangkatGolongan->pangkat }}
-                                                {{ $pegawai->pangkatGolongan->golongan }}/{{ $pegawai->pangkatGolongan->ruang }}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 2px 0;">NIP</td>
-                                            <td style="padding: 2px 0;">:</td>
-                                            <td style="padding: 2px 0;">{{ $pegawai->nip ?? '-' }}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 2px 0;">Jabatan</td>
-                                            <td style="padding: 2px 0;">:</td>
-                                            <td style="padding: 2px 0;">
-                                                {{ $pegawai->jabatan ?? '-' }}</td>
-                                        </tr>
-                                    </table>
+                                <td style="width: 25%; padding: 1px 0; line-height: 1.4;">Nama</td>
+                                <td style="width: 5%; padding: 1px 0; line-height: 1.4;">:</td>
+                                <td style="padding: 1px 0; line-height: 1.4;">
+                                    <strong>{{ $pegawai->nama_lengkap }}</strong></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 0; line-height: 1.4;">NIP</td>
+                                <td style="padding: 1px 0; line-height: 1.4;">:</td>
+                                <td style="padding: 1px 0; line-height: 1.4;">{{ $pegawai->nip }}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1px 0; line-height: 1.4;">Pangkat/Gol</td>
+                                <td style="padding: 1px 0; line-height: 1.4;">:</td>
+                                <td style="padding: 1px 0; line-height: 1.4;">
+                                    {{ $pegawai->pangkatGolongan->pangkat }}
+                                    {{ $pegawai->pangkatGolongan->golongan }}/{{ $pegawai->pangkatGolongan->ruang }}
                                 </td>
                             </tr>
+                            <tr>
+                                <td style="padding: 1px 0; line-height: 1.4;">Jabatan</td>
+                                <td style="padding: 1px 0; line-height: 1.4;">:</td>
+                                <td style="padding: 1px 0; line-height: 1.4;">{{ $pegawai->jabatan }}</td>
+                            </tr>
                         </table>
-                    @endforeach
-                </td>
-            </tr>
-            {{-- kepada surat tugas end --}}
+                    </td>
+                </tr>
+            </table>
+        @endforeach
+        {{-- kepada surat tugas end --}}
 
-            {{-- tanggal pelaksanaan start --}}
+        {{-- tanggal pelaksanaan start --}}
+        <table style="width: 100%; margin-top: 15px;">
             <tr>
-                <td style="width: 25%; vertical-align: top; padding-bottom: 20px;">Tanggal
-                    Pelaksanaan</td>
-                <td style="width: 15px; vertical-align: top; padding-bottom: 20px;">:</td>
-                <td style="vertical-align: top; text-align: justify; padding-bottom: 20px;">
+                <td style="width: 25%; vertical-align: top; line-height: 1.5;">Tanggal Pelaksanaan</td>
+                <td style="width: 15px; vertical-align: top; line-height: 1.5;">:</td>
+                <td style="vertical-align: top; text-align: justify; line-height: 1.5;">
                     @if ($surat->tanggal_mulai === $surat->tanggal_selesai)
-                        {{-- Jika tanggal sama, tampilkan satu saja --}}
-                        {{ \Carbon\Carbon::parse($surat->tanggal_mulai)->locale('id')->translatedFormat('d F Y') }}
+                        {{ \Carbon\Carbon::parse($surat->tanggal_mulai)->locale('id')->translatedFormat('j F Y') }}
                     @else
-                        {{-- Jika tanggal berbeda, tampilkan rentang tanggal --}}
-                        {{ \Carbon\Carbon::parse($surat->tanggal_mulai)->locale('id')->translatedFormat('d F Y') }}
+                        {{ \Carbon\Carbon::parse($surat->tanggal_mulai)->locale('id')->translatedFormat('j F Y') }}
                         s/d
-                        {{ \Carbon\Carbon::parse($surat->tanggal_selesai)->locale('id')->translatedFormat('d F Y') }}
+                        {{ \Carbon\Carbon::parse($surat->tanggal_selesai)->locale('id')->translatedFormat('j F Y') }}
                     @endif
                 </td>
             </tr>
-            {{-- tanggal pelaksanaan end --}}
+        </table>
+        {{-- tanggal pelaksanaan end --}}
 
-            {{-- tempat pelaksanaan start --}}
+        {{-- tempat pelaksanaan start --}}
+        <table style="width: 100%; margin-top: 20px;">
             <tr>
                 <td style="width: 25%; vertical-align: top; padding-bottom: 20px;">Tempat</td>
                 <td style="width: 15px; vertical-align: top; padding-bottom: 20px;">:</td>
                 <td style="vertical-align: top; text-align: justify; padding-bottom: 20px;">
                     {{ $surat->tempat_pelaksanaan }}</td>
             </tr>
-            {{-- tempat pelaksanaan end --}}
-
         </table>
+        {{-- tempat pelaksanaan end --}}
     </div>
 
 </body>

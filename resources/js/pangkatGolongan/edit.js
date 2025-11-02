@@ -1,3 +1,5 @@
+import { focusIfNotTouch } from '../utils/touchDeviceDetection.js'
+
 export const editMethods = {
   async editPangkatGolongan(id) {
     let pangkatGolongan = this.dataTable
@@ -15,22 +17,13 @@ export const editMethods = {
       this.modalTitle = 'Edit Pangkat Golongan';
       this.textSubmit = 'Update';
       this.editingId = pangkatGolongan.id;
-      this.originalForm = {
-        pangkat: data.data.pangkat,
-        golongan: data.data.golongan,
-        ruang: data.data.ruang,
-      };
-      this.form.pangkat = data.data.pangkat;
-      this.form.golongan = data.data.golongan;
-      this.form.ruang = data.data.ruang;
+      this.originalForm = { ...data.data };
+      this.form = { ...this.originalForm };
       this.showModal = true;
 
       this.$nextTick(() => {
         // Cek apakah bukan touch device
-        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        if (!isTouchDevice) {
-          this.$refs.pangkatInput.focus();
-        }
+        focusIfNotTouch(this.$refs.pangkatInput);
 
       });
     } catch (error) {

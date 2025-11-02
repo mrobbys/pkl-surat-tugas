@@ -1,3 +1,5 @@
+import { focusIfNotTouch } from '../utils/touchDeviceDetection.js'
+
 export const editMethods = {
   async editRole(id) {
     try {
@@ -21,10 +23,7 @@ export const editMethods = {
         await this.fetchPermissions();
 
         // Cek apakah bukan touch device
-        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        if (!isTouchDevice) {
-          this.$refs.nameInput.focus();
-        }
+        focusIfNotTouch(this.$refs.nameInput);
       });
     } catch (error) {
       console.error('Error fetching role data:', error);

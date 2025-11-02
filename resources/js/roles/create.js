@@ -1,3 +1,5 @@
+import { focusIfNotTouch } from '../utils/touchDeviceDetection.js'
+
 export const createMethods = {
   async openCreateModal() {
     this.modalTitle = 'Tambah Role';
@@ -9,16 +11,7 @@ export const createMethods = {
       await this.fetchPermissions();
 
       // Cek apakah bukan touch device
-      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      if (!isTouchDevice) {
-        this.$refs.nameInput.focus();
-      }
-
-      // validasi form
-      setTimeout(() => {
-        this.validateForm('name');
-        this.validateForm('permissions');
-      });
+      focusIfNotTouch(this.$refs.nameInput);
     });
   },
 }

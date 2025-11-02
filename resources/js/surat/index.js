@@ -1,3 +1,7 @@
+import { getStatusConfig } from '../utils/statusTelaahStafIndex.js'
+import { formatTanggalIndonesia} from '../utils/dateFormatterIndonesia.js'
+import { initTippy } from '../utils/tippyInit.js'
+
 export const indexMethods = {
   fetchTelaahStaf() {
     const self = this;
@@ -29,24 +33,7 @@ export const indexMethods = {
         data: 'tanggal_telaahan',
         name: 'tanggal_telaahan',
         render: function (data, type, row) {
-          if (!data) return '';
-          // Format: yyyy-mm-dd → dd Month yyyy
-          const bulanIndo = [
-            'Januari',
-            'Februari',
-            'Maret',
-            'April',
-            'Mei',
-            'Juni',
-            'Juli',
-            'Agustus',
-            'September',
-            'Oktober',
-            'November',
-            'Desember',
-          ];
-          const [year, month, day] = data.split('-');
-          return `${parseInt(day)} ${bulanIndo[parseInt(month) - 1]} ${year}`;
+          return formatTanggalIndonesia(data);
         },
       },
       {
@@ -55,59 +42,16 @@ export const indexMethods = {
       },
       {
         data: 'status',
-        name: 'status',
-        render: (data) => {
-          const statusConfig = {
-            'diajukan': {
-              label: 'Diajukan',
-              class: 'bg-blue-100 text-blue-800 border-blue-200',
-              icon: 'ri-time-line'
-            },
-            'disetujui_kabid': {
-              label: 'Disetujui Kabid',
-              class: 'bg-green-100 text-green-800 border-green-200',
-              icon: 'ri-checkbox-circle-line'
-            },
-            'revisi_kabid': {
-              label: 'Revisi Kabid',
-              class: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-              icon: 'ri-error-warning-line'
-            },
-            'ditolak_kabid': {
-              label: 'Ditolak Kabid',
-              class: 'bg-red-100 text-red-800 border-red-200',
-              icon: 'ri-close-circle-line'
-            },
-            'disetujui_kadis': {
-              label: 'Disetujui Kadis',
-              class: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-              icon: 'ri-checkbox-circle-line'
-            },
-            'revisi_kadis': {
-              label: 'Revisi Kadis',
-              class: 'bg-orange-100 text-orange-800 border-orange-200',
-              icon: 'ri-error-warning-line'
-            },
-            'ditolak_kadis': {
-              label: 'Ditolak Kadis',
-              class: 'bg-rose-100 text-rose-800 border-rose-200',
-              icon: 'ri-close-circle-line'
-            },
-          };
-
-          const config = statusConfig[data] || {
-            label: data,
-            class: 'bg-gray-100 text-gray-800 border-gray-200',
-            icon: 'ri-question-line'
-          };
-
-          return `
-                                        <span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${config.class}">
-                                            <i class="${config.icon}"></i>
-                                            <span>${config.label}</span>
-                                        </span>
-                                    `;
-        }
+          name: 'status',
+          render: (data) => {
+            const config = getStatusConfig(data);
+            return `
+              <span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${config.class}">
+                <i class="${config.icon}"></i>
+                <span>${config.label}</span>
+              </span>
+            `;
+          }
       },
       {
         data: 'id',
@@ -252,16 +196,7 @@ export const indexMethods = {
       ],
       // Callback setelah DataTable selesai draw
       drawCallback: function () {
-        // Initialize Tippy.js untuk semua button
-        tippy('[data-tippy-content]', {
-          placement: 'left-start',
-          arrow: true,
-          theme: 'light',
-          allowHTML: true,
-          trigger: 'mouseenter',
-          hideOnClick: true,
-          touch: false,
-        });
+        initTippy()
       }
     });
 

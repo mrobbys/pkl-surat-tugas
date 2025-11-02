@@ -1,9 +1,5 @@
 export const storeUpdateMethods = {
   async saveUser() {
-    // Validasi semua field sebelum submit
-    const fields = ['nip', 'nama_lengkap', 'email', 'password', 'jabatan'];
-    fields.forEach((f) => this.validateForm(f));
-    if (!this.isFormValid()) return;
 
     this.loading = true;
 

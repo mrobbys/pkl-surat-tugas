@@ -29,7 +29,6 @@ class UpdateRoleRequest extends FormRequest
                 'min:3',
                 'unique:roles,name,' . $id,
                 'regex:/^[a-z0-9]+(-[a-z0-9]+)*$/',
-                'not_regex:/<\s*script\b[^>]*>(.*?)<\s*\/\s*script>/i'
             ],
             'permissions' => 'required|min:1|array',
         ];
@@ -47,9 +46,6 @@ class UpdateRoleRequest extends FormRequest
             'permissions.required' => 'Permissions harus dipilih minimal 1.',
             'permissions.min' => 'Permissions harus dipilih minimal 1.',
             'permissions.array' => 'Permissions harus berupa array.',
-
-            'not_regex' => 'Input mengandung karakter terlarang.'
-            
         ];
     }
 }

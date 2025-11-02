@@ -1,3 +1,5 @@
+import { focusIfNotTouch } from '../utils/touchDeviceDetection.js'
+
 export const approveTelaahStaf = {
   // open modal approve satu
   approveTelaahStafSatu(id) {
@@ -16,10 +18,7 @@ export const approveTelaahStaf = {
 
     this.$nextTick(() => {
       // Cek apakah bukan touch device
-      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      if (!isTouchDevice) {
-        this.$refs.status.focus();
-      }
+      focusIfNotTouch(this.$refs.status);
     });
   },
 

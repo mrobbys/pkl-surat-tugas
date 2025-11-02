@@ -1,10 +1,5 @@
 export const storeUpdateMethods = {
   async savePangkatGolongan() {
-    // valiadsi semua field sebelum submit
-    const fields = ['pangkat', 'golongan', 'ruang'];
-    fields.forEach((field) => this.validateForm(field));
-    if (!this.isFormValid()) return;
-
     this.loading = true;
 
     // tentukan URL dan method apakah sedang mengedit atau membuat baru berdasarkan id

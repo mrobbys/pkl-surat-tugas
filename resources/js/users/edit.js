@@ -1,3 +1,5 @@
+import { focusIfNotTouch } from '../utils/touchDeviceDetection.js'
+
 export const editMethods = {
   async editUser(id) {
     try {
@@ -30,10 +32,7 @@ export const editMethods = {
         await this.fetchPangkatGolonganAndRoles();
 
         // Cek apakah bukan touch device
-        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        if (!isTouchDevice) {
-          this.$refs.nipInput.focus();
-        }
+        focusIfNotTouch(this.$refs.nipInput);
 
         setTimeout(() => {
           this.setChoicesSelectedValues();

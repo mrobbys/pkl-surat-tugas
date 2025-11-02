@@ -1,3 +1,5 @@
+import { focusIfNotTouch } from '../utils/touchDeviceDetection.js'
+
 export const createMethods = {
   async openCreateModal() {
     this.modalTitle = 'Tambah User Baru';
@@ -13,19 +15,7 @@ export const createMethods = {
       await this.fetchPangkatGolonganAndRoles();
 
       // Cek apakah bukan touch device
-      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      if (!isTouchDevice) {
-        this.$refs.nipInput.focus();
-      }
-
-      // Validasi form
-      setTimeout(() => {
-        this.validateForm('nip');
-        this.validateForm('nama_lengkap');
-        this.validateForm('email');
-        this.validateForm('password');
-        this.validateForm('jabatan');
-      });
+      focusIfNotTouch(this.$refs.nipInput);
     });
   },
 }

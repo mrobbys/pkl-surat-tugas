@@ -1,15 +1,14 @@
+import { focusIfNotTouch } from '../utils/touchDeviceDetection.js'
+
 export const telaahStafFormMethods = {
   init() {
     this.$nextTick(() => {
       this.initChoices();
       this.initCKEditor();
 
-      // Cek apakah bukan touch device
-      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      
-      // focus input pertama jika bukan show
-      if (this.mode !== 'show' && this.$refs.kepada_ythInput && !isTouchDevice) {
-        this.$refs.kepada_ythInput.focus();
+      // Cek apakah bukan touch device, focus input pertama jika bukan show mode
+      if (this.mode !== 'show' && this.$refs.kepada_ythInput) {
+        focusIfNotTouch(this.$refs.kepada_ythInput);
       }
     });
   },
