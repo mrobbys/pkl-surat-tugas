@@ -24,7 +24,7 @@
                 Kembali
             </a>
             {{-- edit button, muncul ketika mode show --}}
-            @if ($mode === 'show')
+            @if ($mode === 'show' && $surat->status !== 'disetujui_kadis' && $surat->status !== 'ditolak_kabid' && $surat->status !== 'ditolak_kadis')
                 @can('edit telaah staf')
                     <a href="{{ route('telaah-staf.edit', $surat->id) }}"
                         class="flex cursor-pointer items-center justify-center gap-1 rounded-lg bg-blue-500 px-4 py-2 font-semibold text-white shadow-sm transition-all duration-300 hover:bg-blue-600 focus:outline-none">

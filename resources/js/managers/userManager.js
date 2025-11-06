@@ -43,17 +43,21 @@ function userManager(config) {
     },
 
     initChoices() {
+      const isDetailMode = this.isShowMode;
+
       // inisialisasi Choices.js untuk input roles multiple
       const rolesElement = document.getElementById('roles-select');
       if (rolesElement && !this.rolesChoice) {
         this.rolesChoice = new Choices(rolesElement, {
-          removeItemButton: true,
+          removeItemButton: !isDetailMode,
           searchResultLimit: 5,
-          placeholderValue: 'Pilih Role',
+          placeholderValue: isDetailMode ? '' : 'Pilih Role',
           noResultsText: 'Tidak ada hasil',
           noChoicesText: 'Tidak ada pilihan',
           itemSelectText: 'Klik untuk memilih',
           shouldSort: false,
+          searchEnabled: !isDetailMode,
+          searchPlaceholderValue: isDetailMode ? '' : 'Cari role...',
           classNames: {
             containerOuter: ['choices'],
             containerInner: ['choices__inner'],
@@ -63,14 +67,15 @@ function userManager(config) {
           },
         });
 
-        // Event listener untuk perubahan pada roles
-        rolesElement.addEventListener('change', (event) => {
-          // Update form data
-          const selectedValues = this.rolesChoice.getValue();
-          this.form.roles = Array.isArray(selectedValues)
-            ? selectedValues.map((item) => item.value)
-            : [];
-        });
+        // Event listener hanya jika bukan detail mode
+        if (!isDetailMode) {
+          rolesElement.addEventListener('change', (event) => {
+            const selectedValues = this.rolesChoice.getValue();
+            this.form.roles = Array.isArray(selectedValues)
+              ? selectedValues.map((item) => item.value)
+              : [];
+          });
+        }
       }
 
       // inisialisasi Choices.js untuk input pangkat golongan
@@ -78,8 +83,11 @@ function userManager(config) {
         document.getElementById('pangkatGolongan-select');
       if (pangkatGolonganElement && !this.pangkatGolonganChoice) {
         this.pangkatGolonganChoice = new Choices(pangkatGolonganElement, {
-          removeItemButton: true,
-          placeholderValue: 'Pilih Pangkat Golongan',
+          removeItemButton: !isDetailMode,
+          searchResultLimit: 5,
+          searchEnabled: !isDetailMode,
+          searchPlaceholderValue: isDetailMode ? '' : 'Cari pangkat golongan...',
+          placeholderValue: isDetailMode ? '' : 'Pilih Pangkat Golongan',
           noChoicesText: 'Tidak ada pilihan',
           noResultsText: 'Tidak ada hasil',
           shouldSort: false,
@@ -88,14 +96,13 @@ function userManager(config) {
           },
         });
 
-        // Event listener untuk perubahan pada pangkat golongan
-        pangkatGolonganElement.addEventListener('change', (event) => {
-          // Update form data
-          const selectedValue = this.pangkatGolonganChoice.getValue();
-          this.form.pangkat_golongan_id = selectedValue
-            ? selectedValue.value
-            : '';
-        });
+        // Event listener hanya jika bukan detail mode
+        if (!isDetailMode) {
+          pangkatGolonganElement.addEventListener('change', (event) => {
+            const selectedValue = this.pangkatGolonganChoice.getValue();
+            this.form.pangkat_golongan_id = selectedValue ? selectedValue.value : '';
+          });
+        }
       }
     },
 

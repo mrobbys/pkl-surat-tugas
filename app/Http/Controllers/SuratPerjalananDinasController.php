@@ -48,6 +48,16 @@ class SuratPerjalananDinasController extends Controller
    */
   public function createTelaahStaf()
   {
+    // cek apakah user memiliki permission 'create telaah staf'
+    if (!Auth::user()->can('create telaah staf')) {
+      return response()->json([
+        'status' => 'error',
+        'icon' => 'error',
+        'title' => 'Gagal',
+        'text' => 'Anda tidak memiliki permission untuk membuat Telaah Staf!',
+      ], 403);
+    }
+
     $pegawais = $this->suratService->getPegawaisForSelect();
     return view('pages.surat.form-telaah-staf', [
       'mode' => 'create',
@@ -110,6 +120,15 @@ class SuratPerjalananDinasController extends Controller
    */
   public function showTelaahStaf(SuratPerjalananDinas $surat)
   {
+    // cek apakah user memiliki permission 'view telaah staf'
+    if (!Auth::user()->can('view telaah staf')) {
+      return redirect()->route('dashboard')->with('alert', [
+        'icon' => 'error',
+        'title' => 'Gagal',
+        'text' => 'Anda tidak memiliki izin untuk melihat telaah staf.',
+      ]);
+    }
+    
     $data = $this->suratService->getTelaahStafDetail($surat);
     return view('pages.surat.form-telaah-staf', [
       'mode' => 'show',
@@ -128,6 +147,29 @@ class SuratPerjalananDinasController extends Controller
    */
   public function editTelaahStaf(SuratPerjalananDinas $surat)
   {
+    // cek apakah user memiliki permission 'edit telaah staf'
+    if (!Auth::user()->can('edit telaah staf')) {
+      return response()->json([
+        'status' => 'error',
+        'icon' => 'error',
+        'title' => 'Gagal',
+        'text' => 'Anda tidak memiliki izin untuk mengedit telaah staf.',
+      ], 403);
+    }
+    
+    // jika status surat 'disetujui_kadis', 'ditolak_kabid', dan 'ditolak_kadis', maka halaman edit tidak bisa diakses
+    if (
+      $surat->status === 'disetujui_kadis' ||
+      $surat->status === 'ditolak_kabid' ||
+      $surat->status === 'ditolak_kadis'
+    ) {
+      return redirect()->route('surat.index')->with('alert', [
+        'icon' => 'error',
+        'title' => 'Gagal',
+        'text' => 'Telaah Staf tidak dapat diedit karena status surat sudah final.',
+      ]);
+    }
+
     $data = $this->suratService->getTelaahStafForEdit($surat);
     $pegawais = $this->suratService->getPegawaisForSelect();
 
@@ -201,6 +243,20 @@ class SuratPerjalananDinasController extends Controller
         'icon' => 'error',
         'title' => 'Gagal',
         'text' => 'Anda tidak memiliki izin untuk menghapus telaah staf.',
+      ], 403);
+    }
+
+    // jika status surat 'disetujui_kadis', 'ditolak_kabid', dan 'ditolak_kadis', maka proses hapus tidak bisa dilakukan
+    if (
+      $surat->status === 'disetujui_kadis' ||
+      $surat->status === 'ditolak_kabid' ||
+      $surat->status === 'ditolak_kadis'
+    ) {
+      return response()->json([
+        'status' => 'error',
+        'icon' => 'error',
+        'title' => 'Gagal',
+        'text' => 'Telaah Staf tidak dapat dihapus karena status surat sudah final.',
       ], 403);
     }
 
@@ -348,7 +404,7 @@ class SuratPerjalananDinasController extends Controller
   public function cetakPDFNotaDinas(SuratPerjalananDinas $surat)
   {
     // cek apakah user memiliki permission 'pdf nota dinas'
-    if (!Auth::user()->can('pdf nota dinas')){
+    if (!Auth::user()->can('pdf nota dinas')) {
       return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk mencetak PDF nota dinas.');
     }
 
@@ -364,9 +420,8 @@ class SuratPerjalananDinasController extends Controller
       Log::error('Error generating PDF for nota dinas: ' . $e->getMessage());
       return redirect()->back()->with('error', 'Gagal mencetak PDF: ' . $e->getMessage());
     }
-    
   }
-  
+
   /**
    * Cetak PDF Surat Tugas
    * 

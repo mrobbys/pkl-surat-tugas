@@ -14,7 +14,8 @@
             method="POST"
             action="{{ route('login.store') }}"
             x-on:submit="loading = true"
-            x-init="email = '{{ old('email', '') }}'">
+            x-init="email = '{{ old('email', '') }}'"
+            >
             @csrf
             {{-- Input Email Start --}}
             <div class="flex w-full flex-col gap-1 text-neutral-600">
@@ -22,15 +23,12 @@
                     class="w-fit pl-0.5 text-sm">Email</label>
                 <input id="email"
                     type="email"
-                    class="{{ $errors->has('email') ? 'border-red-500' : 'border-neutral-300 focus:border-blue-500' }} w-full rounded-sm border bg-neutral-100 px-2 py-3 text-sm transition duration-300 focus:outline-none focus:ring-0"
+                    class="w-full rounded-sm border bg-neutral-100 px-2 py-3 text-sm border-neutral-300 focus:border-blue-500 transition duration-300 focus:outline-none focus:ring-0"
                     name="email"
                     placeholder="nama@gmail.com"
                     autocomplete="off"
                     x-model="email"
                     />
-                @error('email')
-                    <small class="text-red-500">{{ $message }}</small>
-                @enderror
             </div>
             {{-- Input Email End --}}
 
@@ -42,7 +40,7 @@
                     <input id="password"
                         x-model="password"
                         :type="showPassword ? 'text' : 'password'"
-                        class="{{ $errors->has('password') ? 'border-red-500' : 'border-neutral-300 focus:border-blue-500' }} w-full rounded-sm border bg-neutral-100 px-2 py-3 text-sm transition duration-300 focus:outline-none focus:ring-0"
+                        class="w-full rounded-sm border bg-neutral-100 px-2 py-3 text-sm border-neutral-300 focus:border-blue-500 transition duration-300 focus:outline-none focus:ring-0"
                         name="password"
                         autocomplete="off"
                         placeholder="••••••••" />
@@ -57,16 +55,6 @@
                             class="ri-eye-line ri-lg"></i>
                     </button>
                 </div>
-
-                @if ($errors->has('password') && is_array($errors->get('password')))
-                    <div class="flex flex-col items-start">
-                        <ul class="list-inside list-disc">
-                            @foreach ($errors->get('password') as $msg)
-                                <li class="text-sm text-red-500">{{ $msg }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
             </div>
             {{-- Input Password End --}}
 

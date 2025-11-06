@@ -1,5 +1,5 @@
 import { getStatusConfig } from '../utils/statusTelaahStafIndex.js'
-import { formatTanggalIndonesia} from '../utils/dateFormatterIndonesia.js'
+import { formatTanggalIndonesia } from '../utils/dateFormatterIndonesia.js'
 import { initTippy } from '../utils/tippyInit.js'
 
 export const indexMethods = {
@@ -42,16 +42,16 @@ export const indexMethods = {
       },
       {
         data: 'status',
-          name: 'status',
-          render: (data) => {
-            const config = getStatusConfig(data);
-            return `
+        name: 'status',
+        render: (data) => {
+          const config = getStatusConfig(data);
+          return `
               <span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${config.class}">
                 <i class="${config.icon}"></i>
                 <span>${config.label}</span>
               </span>
             `;
-          }
+        }
       },
       {
         data: 'id',
@@ -75,7 +75,12 @@ export const indexMethods = {
                                                 `;
 
           // btn edit
-          if (self.config.canEdit) {
+          if (
+            self.config.canEdit &&
+            row.status !== 'disetujui_kadis' &&
+            row.status !== 'ditolak_kabid' &&
+            row.status !== 'ditolak_kadis'
+          ) {
             actions += `
                                                 <a
                                                     href="/surat/telaah-staf/${data}/edit"
@@ -89,7 +94,12 @@ export const indexMethods = {
           }
 
           // btn delete
-          if (self.config.canDelete) {
+          if (
+            self.config.canDelete &&
+            row.status !== 'disetujui_kadis' &&
+            row.status !== 'ditolak_kabid' &&
+            row.status !== 'ditolak_kadis'
+          ) {
             actions += `
                                                 <button
                                                     type="button"

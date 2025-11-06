@@ -2,12 +2,13 @@ function loginManager() {
   return {
     loading: false,
     showPassword: false,
+
     email: '',
     password: '',
 
     // email & password dibawah ini hanya untuk testing
-    // email: 'superadmin@gmail.com',
-    // password: 'Password1.',
+    // email: 'superadin@gmail.com',
+    // password: 'Pasword',
 
     // cek apakah form valid
     isFormValid() {

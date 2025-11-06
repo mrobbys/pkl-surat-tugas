@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Models\SuratPerjalananDinas;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 
 class SuratPerjalananDinasService
 {
@@ -18,7 +19,7 @@ class SuratPerjalananDinasService
   public function getAllSurats()
   {
     // query semua data surat perjalanan dinas
-    $query = SuratPerjalananDinas::with([ 'pembuat']);
+    $query = SuratPerjalananDinas::with(['pembuat']);
 
     // filter berdasarkan user yang sedang login
     $user = Auth::user();
@@ -158,6 +159,11 @@ class SuratPerjalananDinasService
       // simpan relasi many to many ke tabel penugasan_pegawai
       $surat->pegawaiDitugaskan()->sync($data['pegawais']);
 
+      // jika status = 'revisi_kabid' maka update status surat menjadi 'diajukan'
+      if ($surat->status === 'revisi_kabid') {
+        $surat->update(['status' => 'diajukan']);
+      }
+
       return $surat;
     });
   }
@@ -293,7 +299,7 @@ class SuratPerjalananDinasService
     if (!$surat->nomor_nota_dinas) {
       throw new \Exception('Nomor Nota Dinas belum diisi.');
     }
-    
+
     // inisialisasi mpdf
     $mpdf = new Mpdf([
       'format' => 'A4',
@@ -402,7 +408,7 @@ class SuratPerjalananDinasService
   public function formatTanggalStatusPenyetuju($tanggal)
   {
     return $tanggal
-      ? \Carbon\Carbon::parse($tanggal)->locale('id')->translatedFormat('d F Y H:i:s')
+      ? \Carbon\Carbon::parse($tanggal)->locale('id')->translatedFormat('j F Y H:i:s')
       : '-';
   }
 
@@ -437,7 +443,7 @@ class SuratPerjalananDinasService
     // format nomor dengan 4 digit
     return sprintf('%04d/%s', $nomorUrut, $tahunSekarang);
   }
-  
+
   /**
    * Generate nomor surat tugas dengan format increment per tahun
    * Format: 0001/YYYY, 0002/YYYY, dst.

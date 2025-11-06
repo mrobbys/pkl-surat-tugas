@@ -4,9 +4,31 @@ namespace App\Http\Requests;
 
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreLoginRequest extends FormRequest
 {
+
+  /**
+   * Jalankan pesan jika validasi gagal
+   * 
+   * @param Validator $validator
+   * 
+   * @return void
+   */
+  protected function failedValidation(Validator $validator)
+  {
+    throw new HttpResponseException(
+      redirect()->back()
+        ->withInput()
+        ->with('alert', [
+          'icon' => 'error',
+          'title' => 'Login Gagal!',
+          'text' => 'Email atau password salah. Silakan coba lagi.',
+        ])
+    );
+  }
 
   /**
    * Determine if the user is authorized to make this request.
@@ -39,7 +61,7 @@ class StoreLoginRequest extends FormRequest
       'email.email' => 'Format email tidak valid.',
       'email.dns' => 'Domain email tidak valid.',
       'email.not_in' => 'Email tidak terdaftar.',
-      
+
       'password.required' => 'Password harus diisi.',
       'password.string' => 'Password harus berupa string.',
       'password.min' => 'Password harus terdiri dari minimal 8 karakter.',

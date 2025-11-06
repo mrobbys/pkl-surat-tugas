@@ -3,11 +3,14 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\PangkatGolongan;
+use App\Models\SuratPerjalananDinas;
+use Illuminate\Support\Facades\Crypt;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
@@ -49,6 +52,22 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Decrypt nip 
+     * 
+     * @param string $value
+     * 
+     * @return string
+     */
+    public function getNipAttribute($value)
+    {
+        try {
+            return Crypt::decryptString($value);
+        } catch (\Exception $e) {
+            return $value; // fallback jika gagal dekripsi
+        }
     }
 
     public function pangkatGolongan()

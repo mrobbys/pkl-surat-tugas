@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use App\Models\PangkatGolongan;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Crypt;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -26,7 +27,7 @@ class UserFactory extends Factory
     {
         return [
             'nama_lengkap' => fake()->name(),
-            'nip' => fake()->unique()->numerify('##################'),
+            'nip' => Crypt::encryptString(fake()->unique()->numerify('##################')),
             'email' => fake()->unique()->userName() . '@gmail.com',
             'password' => static::$password ??= Hash::make('Password1.'),
             'pangkat_golongan_id' => PangkatGolongan::inRandomOrder()->first()?->id,

@@ -43,7 +43,7 @@ class LoginController extends Controller
                 'text' => 'Selamat datang, ' . Auth::user()->nama_lengkap . '!',
             ]);
         }
-
+        
         // Jika autentikasi gagal, kembalikan ke halaman login dengan pesan error
         return redirect()->back()->with('alert', [
             'icon' => 'error',

@@ -7,6 +7,7 @@ use App\Models\PangkatGolongan;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Crypt;
 
 class UserService
 {
@@ -56,7 +57,8 @@ class UserService
     return DB::transaction(function () use ($data) {
       // buat data user
       $user = User::create([
-        'nip' => $data['nip'],
+        // enkripsi nip sebelum disimpan ke database
+        'nip' => Crypt::encryptString($data['nip']),
         'nama_lengkap' => $data['nama_lengkap'],
         'email' => $data['email'],
         'password' => Hash::make($data['password']),
@@ -102,7 +104,8 @@ class UserService
     return DB::transaction(function () use ($user, $data) {
       // update data user
       $user->update([
-        'nip' => $data['nip'],
+        // enkripsi nip sebelum disimpan ke database
+        'nip' => Crypt::encryptString($data['nip']),
         'nama_lengkap' => $data['nama_lengkap'],
         'email' => $data['email'],
         'pangkat_golongan_id' => $data['pangkat_golongan_id'],
