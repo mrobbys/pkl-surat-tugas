@@ -75,11 +75,15 @@ export const indexMethods = {
                                                 `;
 
           // btn edit
+          // hanya tampilkan tombol edit jika user adalah super-admin atau memiliki izin edit
+          // dan status bukan 'disetujui_kadis', 'ditolak_kabid', atau 'ditolak_kadis'
           if (
-            self.config.canEdit &&
-            row.status !== 'disetujui_kadis' &&
-            row.status !== 'ditolak_kabid' &&
-            row.status !== 'ditolak_kadis'
+            (self.config.isSuperAdmin || self.config.canEdit) &&
+            (self.config.isSuperAdmin || (
+              row.status !== 'disetujui_kadis' &&
+              row.status !== 'ditolak_kabid' &&
+              row.status !== 'ditolak_kadis'
+            ))
           ) {
             actions += `
                                                 <a
@@ -94,11 +98,15 @@ export const indexMethods = {
           }
 
           // btn delete
-          if (
-            self.config.canDelete &&
-            row.status !== 'disetujui_kadis' &&
-            row.status !== 'ditolak_kabid' &&
-            row.status !== 'ditolak_kadis'
+          // hanya tampilkan tombol delete jika user adalah super-admin atau memiliki izin delete
+          // dan status bukan 'disetujui_kadis', 'ditolak_kabid', atau 'ditolak_kadis'
+          if(
+            (self.config.isSuperAdmin || self.config.canDelete) &&
+            (self.config.isSuperAdmin || (
+              row.status !== 'disetujui_kadis' &&
+              row.status !== 'ditolak_kabid' &&
+              row.status !== 'ditolak_kadis'
+            ))
           ) {
             actions += `
                                                 <button

@@ -1,5 +1,6 @@
 @php
     $config = [
+    'isSuperAdmin' => Auth::user()->hasRole('super-admin'),
     'canEdit' => Auth::user()->can('edit telaah staf'),
     'canDelete' => Auth::user()->can('delete telaah staf'),
     'canApproveTSLevel1' => Auth::user()->can('approve telaah staf level 1'),

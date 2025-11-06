@@ -57,7 +57,7 @@ function sm(){return{init(){let t=document.getElementById("calendar");new Calend
                                                     >
                                                         <i class="ri-zoom-in-fill"></i>
                                                 </a>
-                                                `,t.config.canEdit&&r.status!=="disetujui_kadis"&&r.status!=="ditolak_kabid"&&r.status!=="ditolak_kadis"&&(i+=`
+                                                `,(t.config.isSuperAdmin||t.config.canEdit)&&(t.config.isSuperAdmin||r.status!=="disetujui_kadis"&&r.status!=="ditolak_kabid"&&r.status!=="ditolak_kadis")&&(i+=`
                                                 <a
                                                     href="/surat/telaah-staf/${e}/edit"
                                                     class="p-2 cursor-pointer text-2xl text-yellow-500 focus:outline-0"
@@ -66,7 +66,7 @@ function sm(){return{init(){let t=document.getElementById("calendar");new Calend
                                                     >
                                                         <i class="ri-edit-2-line"></i>
                                                 </a>
-                                    `),t.config.canDelete&&r.status!=="disetujui_kadis"&&r.status!=="ditolak_kabid"&&r.status!=="ditolak_kadis"&&(i+=`
+                                    `),(t.config.isSuperAdmin||t.config.canDelete)&&(t.config.isSuperAdmin||r.status!=="disetujui_kadis"&&r.status!=="ditolak_kabid"&&r.status!=="ditolak_kadis")&&(i+=`
                                                 <button
                                                     type="button"
                                                     class="btn-delete peer p-2 cursor-pointer text-2xl text-red-700 focus:outline-0"
