@@ -1,11 +1,12 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ActivityContoller;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PangkatGolonganController;
-use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SuratPerjalananDinasController;
-use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Route;
 
 require __DIR__ . '/auth.php';
 
@@ -22,6 +23,9 @@ Route::middleware(['auth'])->group(function () {
 
   // user routes
   Route::resource('users', UserController::class)->middleware(['can:view users']);
+
+  // activity log routes
+  Route::get("/activity-logs", [ActivityContoller::class, 'index'])->middleware(['can:view activity log'])->name('activity-logs.index');
 
   // surat perjalanan dinas routes
   // index

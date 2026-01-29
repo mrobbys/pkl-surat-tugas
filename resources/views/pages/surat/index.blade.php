@@ -16,7 +16,6 @@
 @endphp
 
 <x-layouts.app-layout :title="'Data Surat Tugas'">
-    {{-- push style end --}}
 
     <div class="relative mb-20 mt-10 overflow-hidden rounded-xl bg-white p-4 shadow-xl"
         x-data="telaahStafManager(@js($config))"

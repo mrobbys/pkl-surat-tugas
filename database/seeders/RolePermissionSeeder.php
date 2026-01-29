@@ -37,6 +37,9 @@ class RolePermissionSeeder extends Seeder
         Permission::create(['name' => 'edit users', 'group' => 'User']);
         Permission::create(['name' => 'delete users', 'group' => 'User']);
 
+        // permissions untuk activity log
+        Permission::create(['name' => 'view activity log', 'group' => 'Activity Log']);
+
         // permissions untuk surat tugas
         Permission::create(['name' => 'view telaah staf', 'group' => 'Telaah Staf']);
         Permission::create(['name' => 'create telaah staf', 'group' => 'Telaah Staf']);

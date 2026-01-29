@@ -3,11 +3,44 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\LogsActivityWithIp;
+use Spatie\Activitylog\LogOptions;
+
 use Carbon\Carbon;
 
 class SuratPerjalananDinas extends Model
 {
+    use LogsActivityWithIp;
+
     protected $guarded = [];
+
+    /**
+     * konfigurasi untuk activity log
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'nomor_telaahan',
+                'nomor_surat_tugas',
+                'nomor_nota_dinas',
+                'kepada_yth',
+                'perihal_kegiatan',
+                'tempat_pelaksanaan',
+                'tanggal_mulai',
+                'tanggal_selesai',
+                'status', 
+                'status_penyetuju_satu', 
+                'catatan_satu',
+                'status_penyetuju_dua', 
+                'catatan_dua',
+                'penyetuju_satu_id',
+                'penyetuju_dua_id'
+            ])
+            ->logOnlyDirty()
+            ->useLogName('surat_perjalanan_dinas')
+            ->setDescriptionForEvent(fn(string $eventName) => "Surat Perjalanan Dinas: {$this->nomor_telaahan} telah di-{$eventName}");
+    }
 
     public function penyetujuSatu()
     {
