@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\PangkatGolongan;
 use App\Models\SuratPerjalananDinas;
+use App\Traits\LogsActivityWithIp;
 use Illuminate\Support\Facades\Crypt;
+use Spatie\Activitylog\LogOptions;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -15,7 +16,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, CanResetPassword, HasRoles;
+    use HasFactory, Notifiable, CanResetPassword, HasRoles, LogsActivityWithIp;
 
     /**
      * The attributes that are mass assignable.
@@ -68,6 +69,18 @@ class User extends Authenticatable
         } catch (\Exception $e) {
             return $value; // fallback jika gagal dekripsi
         }
+    }
+
+    /**
+     * konfigurasi untuk activity log
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['nama_lengkap', 'email', 'jabatan', 'pangkat_golongan_id'])
+            ->logOnlyDirty()
+            ->useLogName('user')
+            ->setDescriptionForEvent(fn(string $eventName) => "User: {$this->nama_lengkap} telah di-{$eventName}");
     }
 
     public function pangkatGolongan()

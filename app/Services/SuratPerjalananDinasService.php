@@ -20,7 +20,7 @@ class SuratPerjalananDinasService
   {
     // query semua data surat perjalanan dinas
     // $query = SuratPerjalananDinas::with(['pembuat']);
-    $query = SuratPerjalananDinas::select(['nomor_telaahan', 'tanggal_telaahan', 'pembuat_id', 'status'])->with('pembuat:id,nama_lengkap');
+    $query = SuratPerjalananDinas::select(['id','nomor_telaahan', 'tanggal_telaahan', 'pembuat_id', 'status'])->with('pembuat:id,nama_lengkap');
 
     // filter berdasarkan user yang sedang login
     $user = Auth::user();

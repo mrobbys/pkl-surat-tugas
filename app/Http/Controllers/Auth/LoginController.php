@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreLoginRequest;
 
 class LoginController extends Controller
-{    
+{
     /**
      * index
      *
@@ -36,14 +35,33 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            // untuk bagian text nanti tampilkan berdasarkan nama pegawai yang diambil dari relasi table pegawais
+            // activity log untuk login jika berhasil
+            activity('auth')
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'email' => Auth::user()->email,
+                ])
+                ->log('User: ' . Auth::user()->nama_lengkap . ' berhasil login');
+
             return redirect()->route('dashboard')->with('alert', [
                 'icon' => 'success',
                 'title' => 'Login Berhasil!',
                 'text' => 'Selamat datang, ' . Auth::user()->nama_lengkap . '!',
             ]);
         }
-        
+
+        // activity log untuk login jika gagal
+        activity('auth')
+            ->withProperties([
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'email' => $credentials['email'],
+            ])
+            ->log('Percobaan login gagal untuk email: ' . $credentials['email']);
+
+
         // Jika autentikasi gagal, kembalikan ke halaman login dengan pesan error
         return redirect()->back()->with('alert', [
             'icon' => 'error',
@@ -59,6 +77,17 @@ class LoginController extends Controller
 
         // jika ada user yang sedang login, lakukan proses logout
         if ($user) {
+            // activity log untuk logout
+            activity('auth')
+                ->causedBy($user)
+                ->withProperties([
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'email' => $user->email,
+                ])
+                ->log('User: ' . $user->nama_lengkap . ' berhasil logout');
+
+
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
