@@ -20,37 +20,37 @@ class RolePermissionSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // permissions untuk manajemen pangkat golongan
-        Permission::create(['name' => 'view pangkat golongan']);
-        Permission::create(['name' => 'create pangkat golongan']);
-        Permission::create(['name' => 'edit pangkat golongan']);
-        Permission::create(['name' => 'delete pangkat golongan']);
+        Permission::create(['name' => 'view pangkat golongan', 'group' => 'Pangkat Golongan']);
+        Permission::create(['name' => 'create pangkat golongan', 'group' => 'Pangkat Golongan']);
+        Permission::create(['name' => 'edit pangkat golongan', 'group' => 'Pangkat Golongan']);
+        Permission::create(['name' => 'delete pangkat golongan', 'group' => 'Pangkat Golongan']);
 
         // permissions untuk manajemen roles
-        Permission::create(['name' => 'view roles']);
-        Permission::create(['name' => 'create roles']);
-        Permission::create(['name' => 'edit roles']);
-        Permission::create(['name' => 'delete roles']);
+        Permission::create(['name' => 'view roles', 'group' => 'Role']);
+        Permission::create(['name' => 'create roles', 'group' => 'Role']);
+        Permission::create(['name' => 'edit roles', 'group' => 'Role']);
+        Permission::create(['name' => 'delete roles', 'group' => 'Role']);
 
         // permissions untuk manajemen users
-        Permission::create(['name' => 'view users']);
-        Permission::create(['name' => 'create users']);
-        Permission::create(['name' => 'edit users']);
-        Permission::create(['name' => 'delete users']);
+        Permission::create(['name' => 'view users', 'group' => 'User']);
+        Permission::create(['name' => 'create users', 'group' => 'User']);
+        Permission::create(['name' => 'edit users', 'group' => 'User']);
+        Permission::create(['name' => 'delete users', 'group' => 'User']);
 
         // permissions untuk surat tugas
-        Permission::create(['name' => 'view telaah staf']);
-        Permission::create(['name' => 'create telaah staf']);
-        Permission::create(['name' => 'edit telaah staf']);
-        Permission::create(['name' => 'delete telaah staf']);
+        Permission::create(['name' => 'view telaah staf', 'group' => 'Telaah Staf']);
+        Permission::create(['name' => 'create telaah staf', 'group' => 'Telaah Staf']);
+        Permission::create(['name' => 'edit telaah staf', 'group' => 'Telaah Staf']);
+        Permission::create(['name' => 'delete telaah staf', 'group' => 'Telaah Staf']);
 
         // permissions untuk approval berjenjang telaah staf
-        Permission::create(['name' => 'approve telaah staf level 1']);
-        Permission::create(['name' => 'approve telaah staf level 2']);
+        Permission::create(['name' => 'approve telaah staf level 1', 'group' => 'Approval Telaah Staf']);
+        Permission::create(['name' => 'approve telaah staf level 2', 'group' => 'Approval Telaah Staf']);
 
         // permissions untuk pdf telaah staf dan surat tugas
-        Permission::create(['name' => 'pdf telaah staf']);
-        Permission::create(['name' => 'pdf nota dinas']);
-        Permission::create(['name' => 'pdf surat tugas']);
+        Permission::create(['name' => 'pdf telaah staf', 'group' => 'PDF']);
+        Permission::create(['name' => 'pdf nota dinas', 'group' => 'PDF']);
+        Permission::create(['name' => 'pdf surat tugas', 'group' => 'PDF']);
 
         // Buat roles superadmin
         $roleSuperAdmin = Role::create(['name' => 'super-admin']);

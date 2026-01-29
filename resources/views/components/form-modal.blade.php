@@ -56,10 +56,7 @@
             </button>
         </div>
         <!-- Dialog Body -->
-        <div class="overflow-y-auto p-4 lg:overflow-y-visible">
-            
-            {{-- div dibawah ini untuk testing form telaah staf --}}
-            {{-- <div class="overflow-y-auto p-4"> --}}
+        <div class="overflow-y-auto p-4">
             <form @submit.prevent="{{ $onSubmit }}"
                 class="space-y-4">
                 {{ $slot }}

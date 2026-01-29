@@ -20,7 +20,11 @@ class DashboardController extends Controller
         // count total surat dibuat
         $totalSurat = SuratPerjalananDinas::count();
         // 5 surat perjalanan dinas terakhir yang baru dibuat
-        $recentSurat = SuratPerjalananDinas::latest()->take(5)->get();
+        $recentSurat = SuratPerjalananDinas::select('id', 'nomor_telaahan', 'tanggal_telaahan', 'status', 'pembuat_id')
+            ->with('pembuat:id,nama_lengkap')
+            ->latest()
+            ->take(5)
+            ->get();
 
         return view('pages.dashboard', [
             'totalPegawai' => $totalPegawai,
@@ -35,7 +39,9 @@ class DashboardController extends Controller
         $kegiatan = [];
 
         // ambil data surat perjalanan dinas yang disetujui
-        $suratPerjalananDinas = SuratPerjalananDinas::where('status', 'disetujui_kadis')->get();
+        $suratPerjalananDinas = SuratPerjalananDinas::select('perihal_kegiatan', 'tanggal_mulai', 'tanggal_selesai')
+            ->whereIn('status', ['disetujui_kabid', 'disetujui_kadis'])
+            ->get();
 
         foreach ($suratPerjalananDinas as $surat) {
             $kegiatan[] = [

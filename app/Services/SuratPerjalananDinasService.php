@@ -19,7 +19,8 @@ class SuratPerjalananDinasService
   public function getAllSurats()
   {
     // query semua data surat perjalanan dinas
-    $query = SuratPerjalananDinas::with(['pembuat']);
+    // $query = SuratPerjalananDinas::with(['pembuat']);
+    $query = SuratPerjalananDinas::select(['nomor_telaahan', 'tanggal_telaahan', 'pembuat_id', 'status'])->with('pembuat:id,nama_lengkap');
 
     // filter berdasarkan user yang sedang login
     $user = Auth::user();

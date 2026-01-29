@@ -41,11 +41,10 @@
             'placeholder' => $placeholder,
             'autocomplete' => 'off',
         ]) }}
-        :class="errors.{{ $name }} ? 
-            'border-red-500' : 
+        :class="errors.{{ $name }} ?
+            'border-red-500' :
             'border-neutral-300 focus:border-blue-500'"
-        class="w-full bg-neutral-100 rounded-sm border px-2 py-3 text-sm transition duration-300 focus:outline-none focus:ring-0" 
-        />
+        class="w-full rounded-sm border bg-neutral-100 px-2 py-3 text-sm transition duration-300 focus:outline-none focus:ring-0" />
     <small class="text-red-500"
         x-show="errors.{{ $name }}"
         x-text="errors.{{ $name }}"></small>

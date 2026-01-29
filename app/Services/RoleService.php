@@ -31,8 +31,10 @@ class RoleService
    */
   public function getPermissionsList()
   {
-    // ambil semua data permissions dan urutkan berdasarkan id asc
-    return Permission::orderBy('id', 'asc')->get();
+    // ambil semua permission, group by 'group', urutkan id asc
+    return Permission::orderBy('id', 'asc')
+      ->get()
+      ->groupBy('group');
   }
 
   /**
