@@ -29,17 +29,24 @@ class SuratPerjalananDinas extends Model
                 'tempat_pelaksanaan',
                 'tanggal_mulai',
                 'tanggal_selesai',
-                'status', 
-                'status_penyetuju_satu', 
+                'status',
+                'status_penyetuju_satu',
                 'catatan_satu',
-                'status_penyetuju_dua', 
+                'status_penyetuju_dua',
                 'catatan_dua',
                 'penyetuju_satu_id',
                 'penyetuju_dua_id'
             ])
             ->logOnlyDirty()
             ->useLogName('surat_perjalanan_dinas')
-            ->setDescriptionForEvent(fn(string $eventName) => "Surat Perjalanan Dinas: {$this->nomor_telaahan} telah di-{$eventName}");
+            ->setDescriptionForEvent(function (string $eventName) {
+                return match ($eventName) {
+                    'created' => "Surat: {$this->nomor_telaahan} telah dibuat",
+                    'updated' => "Surat: {$this->nomor_telaahan} telah diupdate",
+                    'deleted' => "Surat: {$this->nomor_telaahan} telah dihapus",
+                    default => "Surat: {$this->nomor_telaahan} telah di-{$eventName}",
+                };
+            });
     }
 
     public function penyetujuSatu()

@@ -2,55 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SuratPerjalananDinas;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use App\Models\SuratPerjalananDinas;
+use App\Services\DashboardService;
 
 class DashboardController extends Controller
 {
-    public function index()
-    {
-        // count total pegawai (kecuali superadmin)
-        $totalPegawai = User::whereDoesntHave('roles', function ($query) {
-            $query->where('name', 'super-admin');
-        })->count();
-        // count total roles
-        $totalRoles = Role::count();
-        // count total surat dibuat
-        $totalSurat = SuratPerjalananDinas::count();
-        // 5 surat perjalanan dinas terakhir yang baru dibuat
-        $recentSurat = SuratPerjalananDinas::select('id', 'nomor_telaahan', 'tanggal_telaahan', 'status', 'pembuat_id')
-            ->with('pembuat:id,nama_lengkap')
-            ->latest()
-            ->take(5)
-            ->get();
+    protected $dashboardService;
 
-        return view('pages.dashboard', [
-            'totalPegawai' => $totalPegawai,
-            'totalRoles' => $totalRoles,
-            'totalSurat' => $totalSurat,
-            'recentSurat' => $recentSurat,
-        ]);
+    public function __construct(DashboardService $dashboardService)
+    {
+        $this->dashboardService = $dashboardService;
     }
 
+    /**
+     * Menampilkan statistik dan data surat terbaru di dashboard
+     * @return \Illuminate\View\View
+     */
+    public function index()
+    {
+        $stats = $this->dashboardService->getDashboardStats();
+        return view('pages.dashboard', $stats);
+    }
+
+    /**
+     * Statistik status pengajuan surat perjalanan dinas untuk chart.js
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function statusStatistics()
+    {
+        return response()->json($this->dashboardService->getStatusStatistics());
+    }
+
+    /**
+     * Statistik proporsi penugasan pegawai berdasarkan golongan untuk chart.js
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function golonganStatistics()
+    {
+        return response()->json($this->dashboardService->getGolonganStatistics());
+    }
+
+    /**
+     * Data kalendar kegiatan dari surat perjalanan dinas yang disetujui
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function calendarData()
     {
-        $kegiatan = [];
-
-        // ambil data surat perjalanan dinas yang disetujui
-        $suratPerjalananDinas = SuratPerjalananDinas::select('perihal_kegiatan', 'tanggal_mulai', 'tanggal_selesai')
-            ->whereIn('status', ['disetujui_kabid', 'disetujui_kadis'])
-            ->get();
-
-        foreach ($suratPerjalananDinas as $surat) {
-            $kegiatan[] = [
-                'title' => $surat->perihal_kegiatan,
-                'start' => $surat->tanggal_mulai,
-                'end' => $surat->tanggal_selesai,
-            ];
-        }
-
-        return response()->json($kegiatan);
+        return response()->json($this->dashboardService->getCalendarData());
     }
 }

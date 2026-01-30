@@ -26,6 +26,13 @@ class PangkatGolongan extends Model
             ->logOnly(['pangkat', 'golongan', 'ruang'])
             ->logOnlyDirty()
             ->useLogName('pangkat_golongan')
-            ->setDescriptionForEvent(fn(string $eventName) => "Pangkat Golongan: {$this->pangkat} {$this->golongan}/{$this->ruang} telah di-{$eventName}");
+            ->setDescriptionForEvent(function (string $eventName) {
+                return match ($eventName) {
+                    'created' => "Pangkat Golongan: {$this->pangkat} {$this->golongan}/{$this->ruang} telah dibuat",
+                    'updated' => "Pangkat Golongan: {$this->pangkat} {$this->golongan}/{$this->ruang} telah diupdate",
+                    'deleted' => "Pangkat Golongan: {$this->pangkat} {$this->golongan}/{$this->ruang} telah dihapus",
+                    default => "Pangkat Golongan: {$this->pangkat} {$this->golongan}/{$this->ruang} telah di-{$eventName}",
+                };
+            });
     }
 }

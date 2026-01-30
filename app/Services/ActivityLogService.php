@@ -8,7 +8,7 @@ class ActivityLogService
 {
   public function getAllLogs()
   {
-    return Activity::select([
+    return Activity::select(
       'id',
       'log_name',
       'description',
@@ -16,8 +16,8 @@ class ActivityLogService
       'causer_id',
       'properties',
       'created_at'
-    ])
-      ->with(['causer:id,email,nama_lengkap'])
+    )
+      ->with('causer:id,email')
       ->orderBy("created_at", "desc")
       ->get();
   }
