@@ -30,7 +30,7 @@ export const indexMethods = {
           } else if (row.properties && row.properties.email) {
             return `<span>${row.properties.email}</span>`
           } else {
-            return `<span class="text-gray-400 italic">Null</span>`
+            return `<span class="text-gray-400 italic">System</span>`
           }
         }
       },

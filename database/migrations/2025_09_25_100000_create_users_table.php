@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('nama_lengkap');
             $table->string("nip")->nullable()->unique();
             $table->string('email')->unique();
-            // $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->foreignId('pangkat_golongan_id')->nullable()->constrained('pangkat_golongans')->onDelete('cascade');
             $table->string('jabatan')->nullable();
+            $table->index('nama_lengkap');
             $table->rememberToken();
             $table->timestamps();
         });

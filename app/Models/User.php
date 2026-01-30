@@ -80,7 +80,14 @@ class User extends Authenticatable
             ->logOnly(['nama_lengkap', 'email', 'jabatan', 'pangkat_golongan_id'])
             ->logOnlyDirty()
             ->useLogName('user')
-            ->setDescriptionForEvent(fn(string $eventName) => "User: {$this->nama_lengkap} telah di-{$eventName}");
+            ->setDescriptionForEvent(function (string $eventName) {
+                return match ($eventName) {
+                    'created' => "User: {$this->nama_lengkap} telah dibuat",
+                    'updated' => "User: {$this->nama_lengkap} telah diupdate",
+                    'deleted' => "User: {$this->nama_lengkap} telah dihapus",
+                    default => "User: {$this->nama_lengkap} telah di-{$eventName}",
+                };
+            });
     }
 
     public function pangkatGolongan()

@@ -20,7 +20,14 @@ class Role extends SpatieRole
       ->logOnly(['name', 'guard_name'])
       ->logOnlyDirty()
       ->useLogName('role')
-      ->setDescriptionForEvent(fn(string $eventName) => "Role: {$this->name} telah di-{$eventName}");
+      ->setDescriptionForEvent(function (string $eventName) {
+        return match ($eventName) {
+          'created' => "Role: {$this->name} telah dibuat",
+          'updated' => "Role: {$this->name} telah diupdate",
+          'deleted' => "Role: {$this->name} telah dihapus",
+          default => "Role: {$this->name} telah di-{$eventName}",
+        };
+      });
   }
 
   /**

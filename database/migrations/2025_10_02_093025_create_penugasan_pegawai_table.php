@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('surat_id')->constrained('surat_perjalanan_dinas')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->unique(['surat_id', 'user_id']);
             $table->timestamps();
         });
     }

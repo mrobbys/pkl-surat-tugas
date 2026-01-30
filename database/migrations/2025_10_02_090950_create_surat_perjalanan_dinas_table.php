@@ -38,6 +38,16 @@ return new class extends Migration
             // status keseluruhan surat perjalanan dinas
             $table->enum('status', ['diajukan', 'disetujui_kabid', 'revisi_kabid', 'ditolak_kabid', 'disetujui_kadis', 'revisi_kadis', 'ditolak_kadis'])->default('diajukan');
             $table->foreignId('pembuat_id')->constrained('users');
+            $table->index([
+                'status',
+                'pembuat_id',
+                'nomor_telaahan',
+                'nomor_surat_tugas',
+                'nomor_nota_dinas',
+                'tanggal_telaahan',
+                'tanggal_mulai',
+                'created_at',
+            ]);
             $table->timestamps();
         });
     }

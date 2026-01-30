@@ -27,7 +27,7 @@
                     <x-main-th-table>No</x-main-th-table>
                     <x-main-th-table>User</x-main-th-table>
                     <x-main-th-table>Deskripsi</x-main-th-table>
-                    <x-main-th-table>Tanggal</x-main-th-table>
+                    <x-main-th-table>Tanggal & Waktu</x-main-th-table>
                     <x-main-th-table>IP Address</x-main-th-table>
                     <x-main-th-table>Log Name</x-main-th-table>
                 </x-slot>
