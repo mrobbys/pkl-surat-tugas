@@ -37,6 +37,25 @@ const defaultTooltipConfig = {
   }
 };
 
+function showLoading(canvasId) {
+  const loadingEl = document.getElementById(`${canvasId}-loading`);
+  const canvasEl = document.getElementById(canvasId);
+
+  if (loadingEl) loadingEl.classList.remove('hidden');
+  if (canvasEl) canvasEl.classList.add('hidden');
+}
+
+/**
+ * Hide loading state
+ */
+function hideLoading(canvasId) {
+  const loadingEl = document.getElementById(`${canvasId}-loading`);
+  const canvasEl = document.getElementById(canvasId);
+
+  if (loadingEl) loadingEl.classList.add('hidden');
+  if (canvasEl) canvasEl.classList.remove('hidden');
+}
+
 /**
  * Generate legend labels dengan nilai
  */
@@ -67,11 +86,136 @@ function generateTooltipLabel(context) {
   return `${context.label}: ${value} (${percentage}%)`;
 }
 
+// chart intensitas surat tugas
+export const intensityStatistics = {
+  chart: null,
+
+  init: async function () {
+    const canvasId = 'intensityChart';
+    showLoading(canvasId);
+    
+    try {
+      const res = await fetch('/dashboard/intensity-statistics');
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      this.renderChart(data);
+    } catch (error) {
+      console.error('Error fetching intensity statistics data:', error);
+      hideLoading(canvasId);
+    }
+  },
+
+  renderChart: function (data) {
+    const ctx = document.getElementById("intensityChart");
+
+    if (!ctx) {
+      console.error('Canvas element with id "intensityChart" not found.');
+      return;
+    }
+
+    if (this.chart) this.chart.destroy();
+
+    hideLoading("intensityChart");
+    
+    if (handleEmptyChart(ctx, data.data, `Data intensitas tahun ${data.year} masih kosong`)) return;
+
+    this.chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.labels,
+        datasets: [{
+          label: 'Jumlah Surat Terbit',
+          data: data.data,
+          backgroundColor: '#4F46E5',
+          borderRadius: 10,
+          barPercentage: 0.5,
+        }],
+      },
+      options: {
+        ...defaultChartConfig,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: `Statistik Intensitas Surat Tugas Tahun ${data.year}`,
+            font: {
+              size: 16,
+              weight: 'bold'
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                return context.parsed.y + ' Surat';
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)',
+            },
+            title: {
+              display: true,
+              text: 'Jumlah Surat',
+              font: {
+                size: 12,
+                weight: 'bold'
+              }
+            },
+            // max: 50,
+            ticks: {
+              stepSize: 20,
+              font: {
+                size: 11
+              },
+              callback: function (value) {
+                return value;
+              }
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: {
+                size: 11
+              },
+              color: "#6B7280",
+              autoSkip: false,
+              maxRotation: 45,
+              minRotation: 0,
+            },
+          }
+        }
+      }
+    });
+
+  },
+
+  destroy: function () {
+    if (this.chart) {
+      this.chart.destroy();
+      this.chart = null;
+    }
+  }
+}
+
 // chart statistik status pengajuan surat
 export const statusStatistics = {
   chart: null,
 
   init: async function () {
+    const canvasId = 'statusChart';
+    showLoading(canvasId);
+    
     try {
       const res = await fetch('/dashboard/status-statistics');
       if (!res.ok) {
@@ -81,6 +225,7 @@ export const statusStatistics = {
       this.renderChart(data);
     } catch (error) {
       console.error('Error fetching status statistics data:', error);
+      hideLoading(canvasId);
     }
   },
 
@@ -94,6 +239,8 @@ export const statusStatistics = {
 
     if (this.chart) this.chart.destroy();
 
+    hideLoading("statusChart");
+    
     if (handleEmptyChart(ctx, data.data, `Data statistik tahun ${data.year} masih kosong`)) return;
 
     const colors = ['#818CF8', '#FB923C', '#F87171', '#22D3EE']
@@ -118,6 +265,14 @@ export const statusStatistics = {
             labels: {
               ...defaultLegendConfig.labels,
               generateLabels: (chart) => generateLegendLabels(chart)
+            }
+          },
+          title: {
+            display: true,
+            text: `Statistik Status Pengajuan Surat Tahun ${data.year}`,
+            font: {
+              size: 16,
+              weight: 'bold'
             }
           },
           tooltip: {
@@ -146,6 +301,9 @@ export const employeeAssignmentByRank = {
   chart: null,
 
   init: async function () {
+    const canvasId = 'golonganChart';
+    showLoading(canvasId);
+    
     try {
       const res = await fetch('/dashboard/golongan-statistics');
       if (!res.ok) {
@@ -155,6 +313,7 @@ export const employeeAssignmentByRank = {
       this.renderChart(data);
     } catch (error) {
       console.error('Error fetching golongan statistics data:', error);
+      hideLoading(canvasId);
     }
   },
 
@@ -168,6 +327,8 @@ export const employeeAssignmentByRank = {
 
     if (this.chart) this.chart.destroy();
 
+    hideLoading("golonganChart");
+    
     if (handleEmptyChart(ctx, data.data, `Data proporsi tahun ${data.year} masih kosong`)) return;
 
     const colors = ['#A78BFA', '#F472B6', '#60A5FA', '#FBBF24'];
@@ -194,6 +355,14 @@ export const employeeAssignmentByRank = {
             labels: {
               ...defaultLegendConfig.labels,
               generateLabels: (chart) => generateLegendLabels(chart)
+            }
+          },
+          title: {
+            display: true,
+            text: `Proporsi Penugasan Per Golongan Tahun ${data.year}`,
+            font: {
+              size: 16,
+              weight: 'bold'
             }
           },
           tooltip: {

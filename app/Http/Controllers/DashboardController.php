@@ -29,6 +29,15 @@ class DashboardController extends Controller
     }
 
     /**
+     * Statistik intensitas penugasan pegawai untuk chart.js
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function intensityStatistics()
+    {
+        return response()->json($this->dashboardService->getIntensityStatistics());
+    }
+
+    /**
      * Statistik status pengajuan surat perjalanan dinas untuk chart.js
      * @return \Illuminate\Http\JsonResponse
      */

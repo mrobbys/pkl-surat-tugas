@@ -62,14 +62,23 @@
             {{-- activity log end --}}
         @endcan
 
-        {{-- surat perjalanan dinas start --}}
-        @can('view telaah staf')
-            <x-sidebar-link href="{{ route('surat.index') }}"
-                icon="ri-file-list-3-fill"
-                colorIcon="text-[#EF4444]">
-                Surat Tugas
+        {{-- todo: tambahkan permission untuk view reports --}}
+        {{-- reports start --}}
+            <x-sidebar-link href=""
+                icon="ri-bar-chart-fill"
+                colorIcon="text-[#F97316]">
+                Laporan Staf
             </x-sidebar-link>
-        @endcan
-        {{-- surat perjalanan dinas end --}}
-    </div>
-</nav>
+            {{-- reports end --}}
+
+            {{-- surat perjalanan dinas start --}}
+            @can('view telaah staf')
+                <x-sidebar-link href="{{ route('surat.index') }}"
+                    icon="ri-file-list-3-fill"
+                    colorIcon="text-[#EF4444]">
+                    Surat Tugas
+                </x-sidebar-link>
+            @endcan
+            {{-- surat perjalanan dinas end --}}
+        </div>
+    </nav>

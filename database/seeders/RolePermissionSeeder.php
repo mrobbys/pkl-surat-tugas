@@ -40,6 +40,9 @@ class RolePermissionSeeder extends Seeder
         // permissions untuk activity log
         Permission::create(['name' => 'view activity log', 'group' => 'Activity Log']);
 
+        // permission untuk halaman reports
+        Permission::create(['name' => 'view reports', 'group' => 'Reports']);
+
         // permissions untuk surat tugas
         Permission::create(['name' => 'view telaah staf', 'group' => 'Telaah Staf']);
         Permission::create(['name' => 'create telaah staf', 'group' => 'Telaah Staf']);
