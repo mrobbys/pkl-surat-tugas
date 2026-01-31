@@ -29,6 +29,12 @@ class DashboardService
     ];
   }
 
+  /**
+   * Total surat perjalanan dinas dalam satu tahun
+   * @param int $year
+   * 
+   * @return int
+   */
   public function getTotalSurat(int $year)
   {
     return SuratPerjalananDinas::whereYear('created_at', $year)->count();
@@ -51,7 +57,7 @@ class DashboardService
    */
   public function getRecentSurat()
   {
-    return SuratPerjalananDinas::select('id', 'nomor_telaahan', 'tanggal_telaahan', 'status', 'pembuat_id')
+    return SuratPerjalananDinas::select('id', 'nomor_telaahan', 'tanggal_telaahan', 'status', 'pembuat_id', )
       ->with('pembuat:id,nama_lengkap')
       ->latest()
       ->take(5)
@@ -60,11 +66,60 @@ class DashboardService
 
   public function getRecentActivities()
   {
-  return Activity::select('id', 'causer_id', 'causer_type', 'description', 'log_name')
+    return Activity::select('id', 'causer_id', 'causer_type', 'description', 'created_at', 'event')
       ->with('causer:id,email')
       ->latest()
       ->take(5)
       ->get();
+  }
+
+  /**
+   * Statistik intensitas surat perjalanan dinas per bulan dalam satu tahun
+   * @return array
+   */
+  public function getIntensityStatistics()
+  {
+    $year = (int) date("Y");
+
+    // menghitung jumlah surat per bulan berdasarkan tanggal_mulai
+    $rawData = SuratPerjalananDinas::query()
+      ->select(DB::raw('EXTRACT(MONTH FROM tanggal_mulai) as month'), DB::raw('count(*) as total'))
+      ->where('status', 'disetujui_kadis')
+      ->whereYear('tanggal_mulai', $year)
+      ->groupBy(DB::raw('EXTRACT(MONTH FROM tanggal_mulai)'))
+      ->orderBy('month')
+      ->pluck('total', 'month')
+      ->toArray();
+
+    // inisialisasi array untuk 12 bulan dengan nilai 0
+    $monthlyData = array_fill(1, 12, 0);
+
+    // isi data dari query
+    foreach ($rawData as $month => $total) {
+      $monthlyData[(int)$month] = $total;
+    }
+
+    // nama bulan
+    $labels = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'Mei',
+      'Jun',
+      'Jul',
+      'Agu',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Des'
+    ];
+
+    return [
+      'year' => $year,
+      'labels' => $labels,
+      'data' => array_values($monthlyData),
+    ];
   }
 
   /**

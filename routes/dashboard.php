@@ -7,6 +7,9 @@ Route::middleware(['auth'])->group(function () {
   // Dashboard route
   Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+  // Dashboard statistik intensitas surat tugas menggunakan chart.js
+  Route::get('/dashboard/intensity-statistics', [DashboardController::class, 'intensityStatistics'])->name('dashboard.intensity-statistics');
+  
   // Dashboard statistik status pengajuan surat menggunakan chart.js
   Route::get('/dashboard/status-statistics', [DashboardController::class, 'statusStatistics'])->name('dashboard.status-statistics');
 

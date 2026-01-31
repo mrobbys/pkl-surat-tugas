@@ -2,7 +2,6 @@
     title="modalTitle"
     size="max-w-5xl"
     onClose="closeModal()"
-    onKeydownEnter="submitApprove()"
     onSubmit="submitApprove()"
     loading="loading">
     {{-- input status start --}}
