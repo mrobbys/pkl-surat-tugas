@@ -15,7 +15,9 @@
 <x-layouts.app-layout :title="'Manajemen Role'">
     <div class="relative mb-20 mt-10 overflow-hidden rounded-xl bg-white px-4 shadow-xl"
         x-data="roleManager(@js($config))"
-        x-init="fetchRoles()">
+        x-init="fetchRoles()"
+        x-on:alpine-destroy.window="destroy()"
+        >
         <div class="w-full">
             @can('create roles')
                 <div class="my-4 flex justify-end">

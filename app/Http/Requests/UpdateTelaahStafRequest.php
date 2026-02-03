@@ -21,11 +21,11 @@ class UpdateTelaahStafRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->surat?->id ?? null;
+        $suratId = $this->route('surat')?->id;
         return [
             'kepada_yth' => 'required|string|min:3|max:255',
             'dari' => 'required|string|min:3|max:255',
-            'nomor_telaahan' => 'required|string|min:3|max:100',
+            'nomor_telaahan' => 'required|string|min:3|max:100|unique:surat_perjalanan_dinas,nomor_telaahan,' . $suratId,
             'tanggal_telaahan' => 'required|date',
             'perihal_kegiatan' => 'required|string|min:3',
             'tempat_pelaksanaan' => 'required|string|min:3|max:255',
@@ -33,7 +33,8 @@ class UpdateTelaahStafRequest extends FormRequest
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'dasar_telaahan' => 'required|string|min:10',
             'isi_telaahan' => 'required|string|min:10',
-            'pegawais' => 'required|array|min:1|exists:users,id',
+            'pegawais' => 'required|array|min:1',
+            'pegawais.*' => 'required|exists:users,id',
         ];
     }
 
@@ -52,6 +53,7 @@ class UpdateTelaahStafRequest extends FormRequest
 
             'nomor_telaahan.required' => 'Nomor telaahan wajib diisi.',
             'nomor_telaahan.string' => 'Nomor telaahan harus berupa string.',
+            'nomor_telaahan.unique' => 'Nomor telaahan sudah digunakan.',
             'nomor_telaahan.min' => 'Nomor telaahan harus terdiri dari minimal 3 karakter.',
             'nomor_telaahan.max' => 'Nomor telaahan tidak boleh lebih dari 100 karakter.',
 
@@ -86,7 +88,7 @@ class UpdateTelaahStafRequest extends FormRequest
             'pegawais.required' => 'Pilih minimal 1 pegawai.',
             'pegawais.array' => 'Pegawai harus berupa array.',
             'pegawais.min' => 'Pilih minimal 1 pegawai.',
-            'pegawais.exists' => 'Pegawai yang dipilih tidak valid.',
+            'pegawais.*.exists' => 'Pegawai yang dipilih tidak valid.',
         ];
     }
 }

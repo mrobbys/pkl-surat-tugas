@@ -28,6 +28,7 @@
         class="relative mt-10 mb-20 overflow-hidden rounded-xl bg-white p-4 shadow-xl"
         x-data="userManager(@js($config))"
         x-init="fetchUsers()"
+        x-on:alpine-destroy.window="destroy()"
     >
         <div class="w-full">
             @can("create users")

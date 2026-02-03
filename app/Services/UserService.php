@@ -6,7 +6,9 @@ use App\Models\User;
 use App\Models\PangkatGolongan;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 
 class UserService
@@ -23,9 +25,8 @@ class UserService
       ->whereDoesntHave('roles', function ($q) {
         $q->where('name', 'super-admin');
       })
-      // urutkan berdasarkan created_at desc, jika nilai created_at sama maka urutkan berdasarkan id asc
+      // urutkan berdasarkan created_at desc
       ->orderByDesc('created_at')
-      ->orderBy('id', 'asc')
       ->get();
   }
 
@@ -37,10 +38,13 @@ class UserService
   public function createUser()
   {
     return [
-      // ambil data pangkat golongan
-      'pangkat_golongan' => PangkatGolongan::orderBy('id', 'asc')->get(),
-      // ambil data roles kecuali superadmin
-      'all_roles' => Role::where('name', '!=', 'super-admin')->orderBy('id', 'asc')->get(),
+      'pangkat_golongan' => Cache::remember('pangkat_golongan_list', 86400, function () {
+        return PangkatGolongan::orderBy('id', 'asc')->get();
+      }),
+
+      'all_roles' => Cache::remember('roles_list_exclude_superadmin', 86400, function () {
+        return Role::where('name', '!=', 'super-admin')->orderBy('id', 'asc')->get();
+      }),
     ];
   }
 
@@ -59,11 +63,11 @@ class UserService
       $user = User::create([
         // enkripsi nip sebelum disimpan ke database
         'nip' => Crypt::encryptString($data['nip']),
-        'nama_lengkap' => $data['nama_lengkap'],
-        'email' => $data['email'],
+        'nama_lengkap' => trim($data['nama_lengkap']),
+        'email' => strtolower(trim($data['email'])),
         'password' => Hash::make($data['password']),
         'pangkat_golongan_id' => $data['pangkat_golongan_id'],
-        'jabatan' => $data['jabatan'],
+        'jabatan' => trim($data['jabatan']),
       ]);
 
       // jika roles ada dan tidak kosong, maka assign role ke user
@@ -73,8 +77,7 @@ class UserService
           ->toArray();
         $user->assignRole($rolesNames);
       }
-
-      return $user;
+      return $user->fresh(['pangkatGolongan', 'roles']);
     });
   }
 
@@ -104,13 +107,17 @@ class UserService
     return DB::transaction(function () use ($user, $data) {
       // update data user
       $user->update([
-        // enkripsi nip sebelum disimpan ke database
-        'nip' => Crypt::encryptString($data['nip']),
-        'nama_lengkap' => $data['nama_lengkap'],
-        'email' => $data['email'],
+        'nama_lengkap' => trim($data['nama_lengkap']),
+        'email' => strtolower(trim($data['email'])),
         'pangkat_golongan_id' => $data['pangkat_golongan_id'],
-        'jabatan' => $data['jabatan'],
+        'jabatan' => trim($data['jabatan']),
       ]);
+
+      // jika nip berbeda, maka update nip user
+      if ($user->nip !== $data['nip']) {
+        $user->update(['nip' => Crypt::encryptString($data['nip'])]);
+      }
+
       // jika password ada dan tidak kosong, maka update password user
       if (isset($data['password']) && !empty($data['password'])) {
         $user->update(['password' => Hash::make($data['password'])]);
@@ -123,7 +130,9 @@ class UserService
         $user->syncRoles($rolesNames);
       }
 
-      return $user;
+      
+
+      return $user->fresh(['pangkatGolongan', 'roles']);
     });
   }
 
@@ -136,6 +145,22 @@ class UserService
    */
   public function deleteUser(User $user)
   {
-    return $user->delete();
+    // jangan hapus akun sendiri
+    if ($user->id === Auth::user()->id) {
+      throw new \Exception("Anda tidak dapat menghapus akun sendiri.");
+    }
+
+    // cek apakah user adalah super-admin
+    if ($user->hasRole('super-admin')) {
+      throw new \Exception("Anda tidak dapat menghapus akun dengan role super-admin.");
+    }
+
+    DB::transaction(function () use ($user) {
+      // hapus semua role dari user
+      $user->syncRoles([]);
+      // hapus user
+      $user->delete();
+      
+    });
   }
 }

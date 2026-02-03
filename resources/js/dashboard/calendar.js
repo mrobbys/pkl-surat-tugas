@@ -35,6 +35,7 @@ export const calendar = {
       headerToolbar: headerConfig.desktop,
       height: 'auto',
       eventClick: this.handleEventClick,
+      eventDidMount: this.handleEventMount,
       events: '/dashboard/calendar',
       eventSourceFailure: function (error) {
         console.error('Failed to load calendar events:', error);
@@ -83,10 +84,22 @@ export const calendar = {
     }
   },
 
+  handleEventMount: function (info) {
+    const safeTitle = info.event.title.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    
+    tippy(info.el, {
+      content: `<div style="text-align:center">Klik untuk lihat detail<br>Surat Tugas:${safeTitle}</div>`,
+      placement: 'top',
+      allowHTML: true,
+      arrow: true,
+      theme: 'light',
+    });
+  },
+
   handleEventClick: function (info) {
     info.jsEvent.preventDefault();
 
-    if (info.event.url) {
+    if (info.event.url && info.event.url.startsWith(window.location.origin)) {
       window.location.href = info.event.url;
     }
   },

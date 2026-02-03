@@ -5,12 +5,65 @@ export const telaahStafFormMethods = {
     this.$nextTick(() => {
       this.initChoices();
       this.initCKEditor();
+      this.initFlatpickr();
 
       // Cek apakah bukan touch device, focus input pertama jika bukan show mode
       if (this.mode !== 'show' && this.$refs.kepada_ythInput) {
         focusIfNotTouch(this.$refs.kepada_ythInput);
       }
     });
+  },
+
+  initFlatpickr() {
+    // config flatpickr
+    const config = {
+      dateFormat: "Y-m-d",
+      altInput: true,
+      altFormat: "j F Y",
+      allowInput: false,
+    };
+
+    const tanggalTelaahan = document.getElementById('tanggal_telaahan');
+    if (tanggalTelaahan && this.mode !== 'show') {
+      this.tanggalTelaahanPicker = flatpickr(tanggalTelaahan, {
+        ...config,
+        defaultDate: this.form.tanggal_telaahan || null,
+        onChange: (selectedDates, dateStr) => {
+          this.form.tanggal_telaahan = dateStr;
+        }
+      });
+    }
+
+    const tanggalMulai = document.getElementById('tanggal_mulai');
+    if (tanggalMulai && this.mode !== 'show') {
+      this.tanggalMulaiPicker = flatpickr(tanggalMulai, {
+        ...config,
+        defaultDate: this.form.tanggal_mulai || null,
+        onChange: (selectedDates, dateStr) => {
+          this.form.tanggal_mulai = dateStr;
+
+          if (this.tanggalSelesaiPicker) {
+            this.tanggalSelesaiPicker.set('minDate', dateStr);
+          }
+        }
+      });
+    }
+
+    const tanggalSelesai = document.getElementById('tanggal_selesai');
+    if (tanggalSelesai && this.mode !== 'show') {
+      this.tanggalSelesaiPicker = flatpickr(tanggalSelesai, {
+        ...config,
+        defaultDate: this.form.tanggal_selesai || null,
+        minDate: this.form.tanggal_mulai || null,
+        onChange: (selectedDates, dateStr) => {
+          this.form.tanggal_selesai = dateStr;
+
+          if (this.tanggalMulaiPicker) {
+            this.tanggalMulaiPicker.set('maxDate', dateStr);
+          }
+        }
+      });
+    }
   },
 
   initCKEditor() {
@@ -118,36 +171,27 @@ export const telaahStafFormMethods = {
       this.form.isi_telaahan = CKEDITOR.instances.isi_telaahan.getData();
     }
 
-    // tentukan URL dan method berdasarkan mode
-    const isUpdate = !!this.editingId;
-    const url = isUpdate
-      ? this.config.updateUrl.replace('__ID__', this.editingId)
-      : this.config.storeUrl;
+    const url = this.mode === 'create'
+      ? this.config.storeUrl
+      : this.config.updateUrl.replace('__ID__', this.editingId);
 
+      const method = this.mode === 'create' ? 'POST' : 'PUT';
+      
     try {
-      const payload = {
-        ...this.form,
-      };
-      
-      // tentukan method berdasarkan create atau update
-      if(isUpdate) {
-        payload._method = 'PUT';
-      }
-      
       const response = await fetch(url, {
-        method: 'POST',
+        method: method,
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': this.csrfToken,
           'X-Requested-With': 'XMLHttpRequest',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(this.form),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        Swal.fire({
+        await Swal.fire({
           icon: data.icon,
           title: data.title,
           text: data.text,

@@ -5,6 +5,7 @@ import { validationForm } from '../pangkatGolongan/validationForm.js';
 import { storeUpdateMethods } from '../pangkatGolongan/storeUpdate.js';
 import { editMethods } from '../pangkatGolongan/edit.js';
 import { deleteMethods } from '../pangkatGolongan/delete.js';
+import { sanitizeString } from '../utils/sanitizeString.js';
 
 function pangkatGolonganManager(config) {
   return {
@@ -17,6 +18,8 @@ function pangkatGolonganManager(config) {
     // Simpan config dari Blade agar bisa diakses sebagai `this.config`
     config: config,
 
+    dataTable: null,
+
     // Gabungkan semua method
     ...indexMethods,
     ...createMethods,
@@ -25,6 +28,11 @@ function pangkatGolonganManager(config) {
     ...editMethods,
     ...deleteMethods,
 
+    // sanitize string
+    sanitizeString(str) {
+      return sanitizeString(str);
+    },
+    
     // close modal
     closeModal() {
       this.showModal = false;
@@ -46,6 +54,19 @@ function pangkatGolonganManager(config) {
     clearErrors() {
       this.errors = {};
     },
+
+    // cleanup
+    destroy() {
+      this.destroyDataTable();
+    },
+
+    // destory datatable
+    destroyDataTable() {
+      if (this.dataTable) {
+        this.dataTable.destroy();
+        this.dataTable = null;
+      }
+    }
   }
 }
 

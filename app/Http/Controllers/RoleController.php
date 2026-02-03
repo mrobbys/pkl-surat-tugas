@@ -32,9 +32,15 @@ class RoleController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            // ambil semua data roles via service
-            $data = $this->roleService->getAllRoles();
-            return response()->json(['data' => $data]);
+            try {
+                $data = $this->roleService->getAllRoles();
+                return response()->json(['data' => $data]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Gagal mengambil data roles.'
+                ], 500);
+            }
         }
         return view('pages.roles.index');
     }
@@ -46,11 +52,15 @@ class RoleController extends Controller
      */
     public function create()
     {
-        // ambil semua data permissions via service
-        $data = $this->roleService->getPermissionsList();
-        return response()->json([
-            'data' => $data
-        ]);
+        try {
+            $data = $this->roleService->getPermissionsList();
+            return response()->json(['data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mengambil data permissions.'
+            ], 500);
+        }
     }
 
     /**
@@ -70,14 +80,11 @@ class RoleController extends Controller
                 'title' => 'Gagal',
                 'text' => 'Anda tidak memiliki izin untuk membuat role.',
             ], 403);
-        }
-
-        // validasi request
-        $data = $request->validated();
+        };
 
         try {
             // simpan data role via service
-            $this->roleService->storeRole($data);
+            $this->roleService->storeRole($request->validated());
 
             // kembalikan response success
             return response()->json([
@@ -87,12 +94,11 @@ class RoleController extends Controller
                 'text' => 'Role berhasil ditambahkan!',
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Error creating role: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'icon' => 'error',
                 'title' => 'Gagal',
-                'text' => 'Gagal menambahkan role. ' . $e->getMessage(),
+                'text' => 'Gagal menambahkan role. Silahkan coba lagi.',
             ], 500);
         }
     }
@@ -106,11 +112,15 @@ class RoleController extends Controller
      */
     public function show(Role $role)
     {
-        // detail data role via service
-        $data = $this->roleService->getRoleDetail($role);
-        return response()->json([
-            'data' => $data
-        ]);
+        try {
+            $data = $this->roleService->getRoleDetail($role);
+            return response()->json(['data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mengambil detail role.'
+            ], 500);
+        }
     }
 
     /**
@@ -122,11 +132,15 @@ class RoleController extends Controller
      */
     public function edit(Role $role)
     {
-        // edit data role via service
-        $data = $this->roleService->getRoleForEdit($role);
-        return response()->json([
-            'data' => $data
-        ]);
+        try {
+            $data = $this->roleService->getRoleForEdit($role);
+            return response()->json(['data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mengambil data role untuk diedit.'
+            ], 500);
+        }
     }
 
     /**
@@ -149,12 +163,9 @@ class RoleController extends Controller
             ], 403);
         }
 
-        // validasi request
-        $data = $request->validated();
-
         try {
             // simpan data role via service
-            $this->roleService->updateRole($role, $data);
+            $this->roleService->updateRole($role, $request->validated());
 
             return response()->json([
                 'status' => 'success',
@@ -163,12 +174,11 @@ class RoleController extends Controller
                 'text' => 'Role berhasil diupdate!',
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error updating role: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'icon' => 'error',
                 'title' => 'Gagal',
-                'text' => 'Gagal mengupdate role. ' . $e->getMessage(),
+                'text' => 'Gagal mengupdate role. Silahkan coba lagi.',
             ], 500);
         }
     }
@@ -203,13 +213,17 @@ class RoleController extends Controller
                 'text' => 'Role berhasil dihapus!'
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error deleting role: ' . $e->getMessage());
+            // cek apakah error karena role masih digunakan
+            $errorMessage = str_contains($e->getMessage(), 'masih digunakan')
+                ? $e->getMessage()
+                : 'Role gagal dihapus. Silakan coba lagi.';
+
             return response()->json([
                 'status' => 'error',
                 'icon' => 'error',
                 'title' => 'Gagal',
-                'text' => 'Role gagal dihapus! ' . $e->getMessage(),
-            ], 500);
+                'text' => $errorMessage,
+            ], 422);
         }
     }
 }

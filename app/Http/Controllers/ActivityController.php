@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Activity;
 use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
 
-class ActivityContoller extends Controller
+class ActivityController extends Controller
 {
   // service activity log
   protected $activityLogService;
@@ -20,9 +19,15 @@ class ActivityContoller extends Controller
   public function index(Request $request)
   {
     if ($request->ajax()) {
-      $data = $this->activityLogService->getAllLogs();
-      
-      return response()->json(['data' => $data]);
+      try {
+        $data = $this->activityLogService->getAllLogs();
+        return response()->json(['data' => $data]);
+      } catch (\Exception $e) {
+        return response()->json([
+          'status' => 'error',
+          'message' => 'Gagal mengambil data activity logs.'
+        ], 500);
+      }
     }
     return view('pages.activity-logs.index');
   }

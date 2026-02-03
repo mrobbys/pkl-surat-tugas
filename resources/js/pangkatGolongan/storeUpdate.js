@@ -1,31 +1,32 @@
 export const storeUpdateMethods = {
   async savePangkatGolongan() {
+    // validasi form sebelum submit
+    if (!this.isFormValid()) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Perhatian',
+        text: 'Mohon lengkapi semua field yang wajib diisi.',
+      });
+      return;
+    }
+
     this.loading = true;
 
-    // tentukan URL dan method apakah sedang mengedit atau membuat baru berdasarkan id
-    const isUpdate = !!this.editingId;
-    const url = isUpdate
+    const url = this.editingId
       ? this.config.updateUrl.replace('__ID__', this.editingId)
       : this.config.storeUrl;
 
+    const method = this.editingId ? 'PUT' : 'POST';
+
     try {
-      const payload = {
-        ...this.form,
-      }
-      
-      // tentukan method berdasarkan create atau update
-      if (isUpdate) {
-        payload._method = 'PUT';
-      }
-      
       const response = await fetch(url, {
-        method: 'POST',
+        method: method,
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': this.csrfToken,
           'X-Requested-With': 'XMLHttpRequest',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(this.form),
       });
 
       const data = await response.json();
@@ -36,7 +37,7 @@ export const storeUpdateMethods = {
         this.dataTable.ajax.reload();
         this.resetForm();
         // tampilkan notifikasi sukses
-        Swal.fire({
+        await Swal.fire({
           icon: data.icon || 'success',
           title: data.title || 'Berhasil',
           text: data.text || 'Data berhasil disimpan.',

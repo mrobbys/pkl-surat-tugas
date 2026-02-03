@@ -6,6 +6,7 @@ import { validationForm } from '../roles/validationForm.js';
 import { editMethods } from '../roles/edit.js';
 import { storeUpdateMethods } from '../roles/storeUpdate.js';
 import { deleteMethods } from '../roles/delete.js';
+import { sanitizeString } from '../utils/sanitizeString.js'
 
 function roleManager(config) {
   return {
@@ -19,6 +20,8 @@ function roleManager(config) {
     // Simpan config dari Blade agar bisa diakses sebagai `this.config`
     config: config,
 
+    dataTable: null,
+    
     // Gabungkan semua method
     ...indexMethods,
     ...showMethods,
@@ -27,6 +30,11 @@ function roleManager(config) {
     ...editMethods,
     ...storeUpdateMethods,
     ...deleteMethods,
+
+    // sanitize string
+    sanitizeString(str) {
+      return sanitizeString(str);
+    },
 
     // close modal
     closeModal() {
@@ -52,13 +60,37 @@ function roleManager(config) {
     // ambil data permissions
     async fetchPermissions() {
       try {
-        const response = await fetch(this.config.permissionsUrl);
+        const response = await fetch(this.config.permissionsUrl, {
+          headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': this.csrfToken,
+          },
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
         this.permissions = data.data;
       } catch (error) {
         console.error('Error fetching permissions:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: 'Gagal mengambil data permissions. Silakan refresh halaman.',
+        });
       }
     },
+
+    // cleanup
+    destroy() {
+      this.destroyDataTable();
+    },
+
+    // destory datatable
+    destroyDataTable() {
+      if (this.dataTable) {
+        this.dataTable.destroy();
+        this.dataTable = null;
+      }
+    }
   }
 }
 

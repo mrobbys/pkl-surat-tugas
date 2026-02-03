@@ -22,7 +22,7 @@
 
             @can('view telaah staf')
                 {{-- card total surat dibuat --}}
-                <x-card-dashboard title="Total Surat Dibuat ({{ $currentYear }})"
+                <x-card-dashboard :title="'Total Surat Dibuat (' . $currentYear . ')'"
                     value="{{ $totalSurat }}"
                     icon="ri-file-list-3-line"
                     iconBgClass="bg-amber-100"

@@ -18,7 +18,7 @@ class ActivityLogService
       'created_at'
     )
       ->with('causer:id,email')
-      ->orderBy("created_at", "desc")
+      ->orderByDesc('created_at')
       ->get();
   }
 }

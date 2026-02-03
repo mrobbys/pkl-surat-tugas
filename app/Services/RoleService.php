@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 use App\Models\Role;
+use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Models\Permission;
 
 class RoleService
@@ -18,9 +19,8 @@ class RoleService
     // ambil data roles kecuali superadmin
     return Role::with('permissions')
       ->where('name', '!=', 'super-admin')
-      // urutkan berdasarkan created_at desc, jika nilai created_at sama maka urutkan berdasarkan id asc
+      // urutkan berdasarkan created_at desc
       ->orderByDesc('created_at')
-      ->orderBy('id', 'asc')
       ->get();
   }
 
@@ -32,9 +32,11 @@ class RoleService
   public function getPermissionsList()
   {
     // ambil semua permission, group by 'group', urutkan id asc
-    return Permission::orderBy('id', 'asc')
-      ->get()
-      ->groupBy('group');
+    return Cache::rememberForever('permissions_grouped', function () {
+      return Permission::orderBy('id', 'asc')
+        ->get()
+        ->groupBy('group');
+    });
   }
 
   /**
@@ -58,6 +60,8 @@ class RoleService
         // sync permissions ke role
         $role->syncPermissions($permissionNames);
       }
+
+      
 
       return $role;
     });
@@ -109,7 +113,7 @@ class RoleService
         $role->syncPermissions($permissionNames);
       }
 
-      return $role;
+      return $role->fresh(['permissions']);
     });
   }
 
@@ -122,13 +126,23 @@ class RoleService
    */
   public function destroyRole(Role $role)
   {
+    // cek apakah role super-admin (tidak boleh dihapus)
+    if ($role->name === 'super-admin') {
+      throw new \Exception('Role super-admin tidak boleh dihapus.');
+    }
+
     // cek apakah role masih dipakai oleh user
     $usersCount = $role->users()->count();
     if ($usersCount > 0) {
       throw new \Exception('Role masih digunakan oleh ' . $usersCount . ' user.');
     }
 
-    // hapus role
-    $role->delete();
+    DB::transaction(function () use ($role) {
+      // hapus semua permissions dari role
+      $role->syncPermissions([]);
+
+      // hapus role
+      $role->delete();
+    });
   }
 }

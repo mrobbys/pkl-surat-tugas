@@ -36,7 +36,7 @@
         id="ruang"
         label="Ruang"
         name="ruang"
-        placeholder="a, b, c, d"
+        placeholder="a, b, c, d, e"
         x-model="form.ruang"
         maxlength="1"
     />

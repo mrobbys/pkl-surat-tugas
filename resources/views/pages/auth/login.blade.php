@@ -1,5 +1,6 @@
 <x-layouts.auth-layout :title="'Login'">
     <div x-data="loginManager()"
+        @keydown.window="handleAutoFocusEmail($event)"
         class="w-full max-w-md rounded-2xl bg-white px-4 py-8 shadow-md">
         <div class="mb-4 flex flex-col items-center justify-center">
             <img src="{{ asset('assets/diskominfo-bjb.png') }}"
@@ -14,21 +15,20 @@
             method="POST"
             action="{{ route('login.store') }}"
             x-on:submit="loading = true"
-            x-init="email = '{{ old('email', '') }}'"
-            >
+            x-init="email = '{{ old('email', '') }}'">
             @csrf
             {{-- Input Email Start --}}
             <div class="flex w-full flex-col gap-1 text-neutral-600">
                 <label for="email"
                     class="w-fit pl-0.5 text-sm">Email</label>
                 <input id="email"
+                    x-ref="emailInput"
                     type="email"
-                    class="w-full rounded-sm border bg-neutral-100 px-2 py-3 text-sm border-neutral-300 focus:border-blue-500 transition duration-300 focus:outline-none focus:ring-0"
+                    class="w-full rounded-sm border border-neutral-300 bg-neutral-100 px-2 py-3 text-sm transition duration-300 focus:border-blue-500 focus:outline-none focus:ring-0"
                     name="email"
                     placeholder="nama@gmail.com"
                     autocomplete="off"
-                    x-model="email"
-                    />
+                    x-model="email" />
             </div>
             {{-- Input Email End --}}
 
@@ -40,7 +40,7 @@
                     <input id="password"
                         x-model="password"
                         :type="showPassword ? 'text' : 'password'"
-                        class="w-full rounded-sm border bg-neutral-100 px-2 py-3 text-sm border-neutral-300 focus:border-blue-500 transition duration-300 focus:outline-none focus:ring-0"
+                        class="w-full rounded-sm border border-neutral-300 bg-neutral-100 px-2 py-3 text-sm transition duration-300 focus:border-blue-500 focus:outline-none focus:ring-0"
                         name="password"
                         autocomplete="off"
                         placeholder="••••••••" />

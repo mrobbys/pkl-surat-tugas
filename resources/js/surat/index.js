@@ -6,6 +6,10 @@ export const indexMethods = {
   fetchTelaahStaf() {
     const self = this;
 
+    if (this.dataTable) {
+      this.dataTable.destroy();
+    }
+
     // inisialisasi datatables
     this.dataTable = new DataTable('#surat-table', {
       layout: {
@@ -27,7 +31,8 @@ export const indexMethods = {
       },
       {
         data: 'nomor_telaahan',
-        name: 'nomor_telaahan'
+        name: 'nomor_telaahan',
+        render: (data) => this.sanitizeString(data),
       },
       {
         data: 'tanggal_telaahan',
@@ -38,7 +43,8 @@ export const indexMethods = {
       },
       {
         data: 'pembuat.nama_lengkap',
-        name: 'pembuat.nama_lengkap'
+        name: 'pembuat.nama_lengkap',
+        render: (data) => this.sanitizeString(data)
       },
       {
         data: 'status',
@@ -48,7 +54,7 @@ export const indexMethods = {
           return `
               <span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${config.class}">
                 <i class="${config.icon}"></i>
-                <span>${config.label}</span>
+                <span>${this.sanitizeString(config.label)}</span>
               </span>
             `;
         }
@@ -100,7 +106,7 @@ export const indexMethods = {
           // btn delete
           // hanya tampilkan tombol delete jika user adalah super-admin atau memiliki izin delete
           // dan status bukan 'disetujui_kadis', 'ditolak_kabid', atau 'ditolak_kadis'
-          if(
+          if (
             (self.config.isSuperAdmin || self.config.canDelete) &&
             (self.config.isSuperAdmin || (
               row.status !== 'disetujui_kadis' &&

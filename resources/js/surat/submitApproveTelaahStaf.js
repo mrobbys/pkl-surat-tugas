@@ -9,20 +9,15 @@ export const submitApproveTelaahStaf = {
         this.approveLevel === 1
           ? this.config.approveTSLevel1Url.replace('__ID__', this.approveId)
           : this.config.approveTSLevel2Url.replace('__ID__', this.approveId);
-
-      const payload = {
-        ...this.approveForm,
-        _method: 'PUT', // Method spoofing untuk bypass ModSecurity
-      };
-
+          
       const response = await fetch(url, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': this.csrfToken,
           'X-Requested-With': 'XMLHttpRequest',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(this.approveForm),
       });
 
       const data = await response.json();
@@ -30,7 +25,7 @@ export const submitApproveTelaahStaf = {
       if (response.ok) {
         this.dataTable.ajax.reload();
         this.resetApproveForm();
-        Swal.fire({
+        await Swal.fire({
           icon: data.icon,
           title: data.title,
           text: data.text,

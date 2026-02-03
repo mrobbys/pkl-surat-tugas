@@ -11,6 +11,11 @@ use App\Models\SuratPerjalananDinas;
 
 class DashboardService
 {
+  // konstanta
+  const STATUS_APPROVED = 'disetujui_kadis';
+  const EXCEPT_ROLE = 'super-admin';
+  const RECENT_LIMIT = 5;
+
   /**
    * Data statistik untuk dashboard
    * @return array
@@ -47,7 +52,7 @@ class DashboardService
   public function getTotalPegawai()
   {
     return User::whereDoesntHave('roles', function ($query) {
-      $query->where('name', 'super-admin');
+      $query->where('name', self::EXCEPT_ROLE);
     })->count();
   }
 
@@ -57,19 +62,36 @@ class DashboardService
    */
   public function getRecentSurat()
   {
-    return SuratPerjalananDinas::select('id', 'nomor_telaahan', 'tanggal_telaahan', 'status', 'pembuat_id', )
+    return SuratPerjalananDinas::select([
+      'id',
+      'nomor_telaahan',
+      'tanggal_telaahan',
+      'status',
+      'pembuat_id'
+    ])
       ->with('pembuat:id,nama_lengkap')
       ->latest()
-      ->take(5)
+      ->take(self::RECENT_LIMIT)
       ->get();
   }
 
+  /**
+   * 5 aktivitas terakhir
+   * @return \Illuminate\Database\Eloquent\Collection
+   */
   public function getRecentActivities()
   {
-    return Activity::select('id', 'causer_id', 'causer_type', 'description', 'created_at', 'event')
+    return Activity::select([
+      'id',
+      'causer_id',
+      'causer_type',
+      'description',
+      'created_at',
+      'event'
+    ])
       ->with('causer:id,email')
       ->latest()
-      ->take(5)
+      ->take(self::RECENT_LIMIT)
       ->get();
   }
 
@@ -84,7 +106,7 @@ class DashboardService
     // menghitung jumlah surat per bulan berdasarkan tanggal_mulai
     $rawData = SuratPerjalananDinas::query()
       ->select(DB::raw('EXTRACT(MONTH FROM tanggal_mulai) as month'), DB::raw('count(*) as total'))
-      ->where('status', 'disetujui_kadis')
+      ->where('status', self::STATUS_APPROVED)
       ->whereYear('tanggal_mulai', $year)
       ->groupBy(DB::raw('EXTRACT(MONTH FROM tanggal_mulai)'))
       ->orderBy('month')
@@ -99,25 +121,22 @@ class DashboardService
       $monthlyData[(int)$month] = $total;
     }
 
-    // nama bulan
-    $labels = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'Mei',
-      'Jun',
-      'Jul',
-      'Agu',
-      'Sep',
-      'Okt',
-      'Nov',
-      'Des'
-    ];
-
     return [
       'year' => $year,
-      'labels' => $labels,
+      'labels' => [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'Mei',
+        'Jun',
+        'Jul',
+        'Agu',
+        'Sep',
+        'Okt',
+        'Nov',
+        'Des'
+      ],
       'data' => array_values($monthlyData),
     ];
   }
@@ -151,17 +170,19 @@ class DashboardService
 
   /**
    * Statistik proporsi penugasan pegawai berdasarkan golongan
+   * Hanya ambil surat dengan status = disetujui_kadis
    * @return array
    */
   public function getGolonganStatistics()
   {
     $year = (int) date('Y');
 
-    $stats = DB::table('penugasan_pegawai')
-      ->join('surat_perjalanan_dinas', 'penugasan_pegawai.surat_id', '=', 'surat_perjalanan_dinas.id')
-      ->join('users', 'penugasan_pegawai.user_id', '=', 'users.id')
+    $stats = User::query()
+      ->select('pangkat_golongans.golongan', DB::raw('COUNT(penugasan_pegawai.id) as total'))
       ->join('pangkat_golongans', 'users.pangkat_golongan_id', '=', 'pangkat_golongans.id')
-      ->select('pangkat_golongans.golongan', DB::raw('count(*) as total'))
+      ->join('penugasan_pegawai', 'users.id', '=', 'penugasan_pegawai.user_id')
+      ->join('surat_perjalanan_dinas', 'penugasan_pegawai.surat_id', '=', 'surat_perjalanan_dinas.id')
+      ->where('surat_perjalanan_dinas.status', self::STATUS_APPROVED)
       ->whereYear('surat_perjalanan_dinas.created_at', $year)
       ->groupBy('pangkat_golongans.golongan')
       ->orderBy('pangkat_golongans.golongan')
@@ -170,8 +191,8 @@ class DashboardService
 
     return [
       'year' => $year,
-      'labels' => array_keys($stats) ?? ['Tidak Ada Data'],
-      'data' => array_values($stats) ?? [0],
+      'labels' => !empty($stats) ? array_keys($stats) : ['Tidak Ada Data'],
+      'data' => !empty($stats) ? array_values($stats) : [0],
     ];
   }
 
@@ -183,16 +204,18 @@ class DashboardService
   {
     $query = SuratPerjalananDinas::query()
       ->select(['id', 'nomor_surat_tugas', 'tanggal_mulai', 'tanggal_selesai', 'status'])
-      ->whereIn('status', ['disetujui_kadis']);
+      ->whereIn('status', [self::STATUS_APPROVED]);
 
     return $query->get()
-      ->map(fn($surat) => [
-        'id' => $surat->id,
-        'title' => $surat->nomor_surat_tugas,
-        'start' => $surat->tanggal_mulai,
-        'end' => Carbon::parse($surat->tanggal_selesai)->addDay()->format('Y-m-d'),
-        'url' => route('telaah-staf.show', $surat->id),
-      ])
+      ->map(function ($surat) {
+        return [
+          'id' => $surat->id,
+          'title' => $surat->nomor_surat_tugas,
+          'start' => $surat->tanggal_mulai,
+          'end' => Carbon::parse($surat->tanggal_selesai)->addDay()->format('Y-m-d'),
+          'url' => route('telaah-staf.show', $surat->id),
+        ];
+      })
       ->toArray();
   }
 }

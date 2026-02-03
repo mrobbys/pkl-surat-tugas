@@ -3,7 +3,11 @@ import { initTippy } from '../utils/tippyInit.js'
 export const indexMethods = {
   fetchRoles() {
     const self = this;
-    
+
+    if (this.dataTable) {
+      this.dataTable.destroy();
+    }
+
     // inisialisasi datatable
     this.dataTable = new DataTable('#role-table', {
       layout: {
@@ -27,6 +31,7 @@ export const indexMethods = {
       {
         data: 'name',
         name: 'name',
+        render: (data) => this.sanitizeString(data),
       },
       {
         data: 'id',

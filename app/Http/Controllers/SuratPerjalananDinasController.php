@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use App\Models\SuratPerjalananDinas;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreTelaahStafRequest;
-use App\Http\Requests\TerbitSuratTugasRequest;
 use App\Http\Requests\UpdateTelaahStafRequest;
 use App\Services\SuratPerjalananDinasService;
 use Illuminate\Support\Facades\Log;
@@ -34,9 +33,15 @@ class SuratPerjalananDinasController extends Controller
   public function indexSurat(Request $request)
   {
     if ($request->ajax()) {
-      // ambil semua data surat via service
-      $data = $this->suratService->getAllSurats();
-      return response()->json(['data' => $data]);
+      try {
+        $data = $this->suratService->getAllSurats();
+        return response()->json(['data' => $data]);
+      } catch (\Exception $e) {
+        return response()->json([
+          'status' => 'error',
+          'message' => 'Gagal memuat data surat.',
+        ], 500);
+      }
     }
     return view('pages.surat.index');
   }
@@ -85,12 +90,9 @@ class SuratPerjalananDinasController extends Controller
       ], 403);
     }
 
-    // validasi request
-    $data = $request->validated();
-
     try {
       // simpan data telaah staf via service
-      $this->suratService->storeTelaahStaf($data);
+      $this->suratService->storeTelaahStaf($request->validated());
 
       // jika semua proses berhasil, kembalikan response success
       return response()->json([
@@ -100,13 +102,12 @@ class SuratPerjalananDinasController extends Controller
         'text' => 'Telaah Staf berhasil dibuat!',
       ], 201);
     } catch (\Exception $e) {
-      Log::error('Error storing telaah staf: ' . $e->getMessage());
       // jika terjadi error, kembalikan response error
       return response()->json([
         'status' => 'error',
         'icon' => 'error',
         'title' => 'Gagal',
-        'text' => 'Telaah Staf gagal dibuat! ' . $e->getMessage(),
+        'text' => 'Telaah Staf gagal dibuat. Silakan coba lagi nanti.',
       ], 500);
     }
   }
@@ -128,14 +129,22 @@ class SuratPerjalananDinasController extends Controller
         'text' => 'Anda tidak memiliki izin untuk melihat telaah staf.',
       ]);
     }
-    
-    $data = $this->suratService->getTelaahStafDetail($surat);
-    return view('pages.surat.form-telaah-staf', [
-      'mode' => 'show',
-      'pegawais' => $data['pegawais'],
-      'surat' => $surat,
-      'data' => $data,
-    ]);
+
+    try {
+      $data = $this->suratService->getTelaahStafDetail($surat);
+      return view('pages.surat.form-telaah-staf', [
+        'mode' => 'show',
+        'pegawais' => $data['pegawais'],
+        'surat' => $surat,
+        'data' => $data,
+      ]);
+    } catch (\Exception $e) {
+      return redirect()->route('surat.index')->with('alert', [
+        'icon' => 'error',
+        'title' => 'Gagal',
+        'text' => 'Gagal memuat detail telaah staf.',
+      ]);
+    }
   }
 
   /**
@@ -156,13 +165,9 @@ class SuratPerjalananDinasController extends Controller
         'text' => 'Anda tidak memiliki izin untuk mengedit telaah staf.',
       ], 403);
     }
-    
-    // jika status surat 'disetujui_kadis', 'ditolak_kabid', dan 'ditolak_kadis', maka halaman edit tidak bisa diakses
-    if (
-      $surat->status === 'disetujui_kadis' ||
-      $surat->status === 'ditolak_kabid' ||
-      $surat->status === 'ditolak_kadis'
-    ) {
+
+    // validasi status surat
+    if ($this->suratService->isFinalStatus($surat)) {
       return redirect()->route('surat.index')->with('alert', [
         'icon' => 'error',
         'title' => 'Gagal',
@@ -170,15 +175,23 @@ class SuratPerjalananDinasController extends Controller
       ]);
     }
 
-    $data = $this->suratService->getTelaahStafForEdit($surat);
-    $pegawais = $this->suratService->getPegawaisForSelect();
+    try {
+      $data = $this->suratService->getTelaahStafForEdit($surat);
+      $pegawais = $this->suratService->getPegawaisForSelect();
 
-    return view('pages.surat.form-telaah-staf', [
-      'mode' => 'edit',
-      'pegawais' => $pegawais,
-      'surat' => $surat,
-      'data' => $data,
-    ]);
+      return view('pages.surat.form-telaah-staf', [
+        'mode' => 'edit',
+        'pegawais' => $pegawais,
+        'surat' => $surat,
+        'data' => $data,
+      ]);
+    } catch (\Exception $e) {
+      return redirect()->route('surat.index')->with('alert', [
+        'icon' => 'error',
+        'title' => 'Error',
+        'text' => 'Gagal memuat form edit.',
+      ]);
+    }
   }
 
   /**
@@ -201,12 +214,9 @@ class SuratPerjalananDinasController extends Controller
       ], 403);
     }
 
-    // validasi request
-    $data = $request->validated();
-
     try {
       // update data telaah staf via service
-      $this->suratService->updateTelaahStaf($surat, $data);
+      $this->suratService->updateTelaahStaf($surat, $request->validated());
 
       // jika semua proses berhasil, kembalikan response success
       return response()->json([
@@ -216,13 +226,12 @@ class SuratPerjalananDinasController extends Controller
         'text' => 'Telaah Staf berhasil diupdate!',
       ], 200);
     } catch (\Exception $e) {
-      Log::error('Error updating telaah staf: ' . $e->getMessage());
       // jika terjadi error, kembalikan response error
       return response()->json([
         'status' => 'error',
         'icon' => 'error',
         'title' => 'Gagal',
-        'text' => 'Telaah Staf gagal diupdate! ' . $e->getMessage(),
+        'text' => 'Telaah Staf gagal diupdate. Silakan coba lagi nanti.',
       ], 500);
     }
   }
@@ -246,12 +255,8 @@ class SuratPerjalananDinasController extends Controller
       ], 403);
     }
 
-    // jika status surat 'disetujui_kadis', 'ditolak_kabid', dan 'ditolak_kadis', maka proses hapus tidak bisa dilakukan
-    if (
-      $surat->status === 'disetujui_kadis' ||
-      $surat->status === 'ditolak_kabid' ||
-      $surat->status === 'ditolak_kadis'
-    ) {
+    // ✅ Validasi status surat
+    if ($this->suratService->isFinalStatus($surat)) {
       return response()->json([
         'status' => 'error',
         'icon' => 'error',
@@ -261,7 +266,6 @@ class SuratPerjalananDinasController extends Controller
     }
 
     try {
-      // hapus telaah staf via service
       $this->suratService->destroyTelaahStaf($surat);
 
       return response()->json([
@@ -271,12 +275,11 @@ class SuratPerjalananDinasController extends Controller
         'text' => 'Telaah Staf berhasil dihapus!',
       ], 200);
     } catch (\Exception $e) {
-      Log::error('Error deleting telaah staf: ' . $e->getMessage());
       return response()->json([
         'status' => 'error',
         'icon' => 'error',
         'title' => 'Gagal',
-        'text' => 'Telaah Staf gagal dihapus! ' . $e->getMessage(),
+        'text' => 'Telaah Staf gagal dihapus. Silakan coba lagi.',
       ], 500);
     }
   }
@@ -301,12 +304,9 @@ class SuratPerjalananDinasController extends Controller
       ], 403);
     }
 
-    // validasi request
-    $data = $request->validated();
-
     try {
       // approve telaah staf level 1 via service
-      $statusPenyetujuSatu = $this->suratService->approveSatuTelaahStaf($surat, $data);
+      $statusPenyetujuSatu = $this->suratService->approveSatuTelaahStaf($surat, $request->validated());
 
       // kembalikan response success
       return response()->json([
@@ -316,13 +316,12 @@ class SuratPerjalananDinasController extends Controller
         'text' => "Telaah Staf berhasil {$statusPenyetujuSatu}!",
       ], 200);
     } catch (\Exception $e) {
-      Log::error('Error approving telaah staf level 1: ' . $e->getMessage());
       // kembalikan response error
       return response()->json([
         'status' => 'error',
         'icon' => 'error',
         'title' => 'Gagal',
-        'text' => 'Telaah Staf gagal disetujui! ' . $e->getMessage(),
+        'text' => 'Proses persetujuan gagal. Silakan coba lagi.',
       ], 500);
     }
   }
@@ -347,12 +346,9 @@ class SuratPerjalananDinasController extends Controller
       ], 403);
     }
 
-    // validasi request
-    $data = $request->validated();
-
     try {
       // approve telaah staf level 2 via service
-      $statusPenyetujuDua = $this->suratService->approveDuaTelaahStaf($surat, $data);
+      $statusPenyetujuDua = $this->suratService->approveDuaTelaahStaf($surat, $request->validated());
 
       return response()->json([
         'status' => 'success',
@@ -361,12 +357,11 @@ class SuratPerjalananDinasController extends Controller
         'text' => "Telaah Staf berhasil {$statusPenyetujuDua}!",
       ], 200);
     } catch (\Exception $e) {
-      Log::error('Error approving telaah staf level 2: ' . $e->getMessage());
       return response()->json([
         'status' => 'error',
         'icon' => 'error',
         'title' => 'Gagal',
-        'text' => 'Telaah Staf gagal disetujui! ' . $e->getMessage(),
+        'text' => 'Proses persetujuan gagal. Silakan coba lagi.',
       ], 500);
     }
   }
@@ -386,11 +381,13 @@ class SuratPerjalananDinasController extends Controller
     }
 
     try {
-      // generate PDF telaah staf via service
       return $this->suratService->generatePDFTelaahStaf($surat);
     } catch (\Exception $e) {
-      Log::error('Error generating PDF for telaah staf: ' . $e->getMessage());
-      return redirect()->back()->with('error', 'Gagal mencetak PDF: ' . $e->getMessage());
+      return redirect()->back()->with('alert', [
+        'icon' => 'error',
+        'title' => 'Gagal',
+        'text' => 'Gagal mencetak PDF. Silakan coba lagi.',
+      ]);
     }
   }
 
@@ -414,11 +411,13 @@ class SuratPerjalananDinasController extends Controller
     }
 
     try {
-      // generate PDF nota dinas via service
       return $this->suratService->generatePDFNotaDinas($surat);
     } catch (\Exception $e) {
-      Log::error('Error generating PDF for nota dinas: ' . $e->getMessage());
-      return redirect()->back()->with('error', 'Gagal mencetak PDF: ' . $e->getMessage());
+      return redirect()->back()->with('alert', [
+        'icon' => 'error',
+        'title' => 'Gagal',
+        'text' => 'Gagal mencetak PDF. Silakan coba lagi.',
+      ]);
     }
   }
 
@@ -442,11 +441,13 @@ class SuratPerjalananDinasController extends Controller
     }
 
     try {
-      // generate PDF surat tugas via service
       return $this->suratService->generatePDFSuratTugas($surat);
     } catch (\Exception $e) {
-      Log::error('Error generating PDF for surat tugas: ' . $e->getMessage());
-      return redirect()->back()->with('error', 'Gagal mencetak PDF: ' . $e->getMessage());
+      return redirect()->back()->with('alert', [
+        'icon' => 'error',
+        'title' => 'Gagal',
+        'text' => 'Gagal mencetak PDF. Silakan coba lagi.',
+      ]);
     }
   }
 }

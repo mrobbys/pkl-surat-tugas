@@ -2,8 +2,13 @@ import { maskNIP, maskEmail } from '../utils/dataMasking.js'
 import { initTippy } from '../utils/tippyInit.js'
 
 export const indexMethods = {
+  
   fetchUsers() {
     const self = this;
+
+    if(this.dataTable){
+      this.dataTable.destroy();
+    }
     
     // inisialisasi datatables
     this.dataTable = new DataTable('#user-table', {
@@ -28,27 +33,23 @@ export const indexMethods = {
       {
         data: 'nip',
         name: 'nip',
-        render: function (data, type, row) {
-          return maskNIP(data);
-        },
+        render: (data) => this.sanitizeString(maskNIP(data)),
       },
       {
         data: 'nama_lengkap',
         name: 'nama_lengkap',
+        render: (data) => this.sanitizeString(data),
       },
       {
         data: 'email',
         name: 'email',
-        render: function (data, type, row) {
-          return maskEmail(data);
-        },
+        render: (data) => this.sanitizeString(maskEmail(data)),
       },
       {
         data: 'roles',
         name: 'roles',
         render: function (data, type, row) {
-          // tampilkan nama role, pisahkan dengan koma
-          return data.map((role) => role.name).join(', ');
+          return data.map((role) => self.sanitizeString(role.name)).join(', ');
         },
       },
       {

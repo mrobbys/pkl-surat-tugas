@@ -4,6 +4,10 @@ export const indexMethods = {
   fetchPangkatGolongans() {
     const self = this;
 
+    if(this.dataTable){
+      this.dataTable.destroy();
+    }
+    
     // Inisialisasi DataTables
     this.dataTable = new DataTable('#pangkat-golongan-table', {
       layout: {
@@ -27,14 +31,17 @@ export const indexMethods = {
       {
         data: 'pangkat',
         name: 'pangkat',
+        render: (data) => this.sanitizeString(data),
       },
       {
         data: 'golongan',
         name: 'golongan',
+        render: (data) => this.sanitizeString(data),
       },
       {
         data: 'ruang',
         name: 'ruang',
+        render: (data) => this.sanitizeString(data),
       },
       {
         data: 'id',

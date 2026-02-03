@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\LogsActivityWithIp;
 use Spatie\Activitylog\LogOptions;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 
 class PangkatGolongan extends Model
@@ -17,6 +18,18 @@ class PangkatGolongan extends Model
         return $this->hasMany(User::class);
     }
 
+    protected static function boot(){
+        parent::boot();
+
+        // clear cache
+        static::saved(function ($pangkatGolongan) {
+            Cache::forget('pangkat_golongan_list');
+        });
+        static::deleted(function ($pangkatGolongan) {
+            Cache::forget('pangkat_golongan_list');
+        });
+    }
+    
     /**
      * konfigurasi untuk activity log
      */

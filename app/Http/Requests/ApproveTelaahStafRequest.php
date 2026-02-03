@@ -23,7 +23,7 @@ class ApproveTelaahStafRequest extends FormRequest
     {
         return [
             'status' => 'required|in:disetujui,revisi,ditolak',
-            'catatan' => 'nullable|string',
+            'catatan' => 'nullable|string|max:1000|required_if:status,revisi,ditolak',
         ];
     }
 
@@ -33,6 +33,8 @@ class ApproveTelaahStafRequest extends FormRequest
             'status.required' => 'Status persetujuan harus diisi.',
             'status.in' => 'Status persetujuan tidak valid.',
             'catatan.string' => 'Catatan harus berupa teks.',
+            'catatan.max' => 'Catatan maksimal 1000 karakter.',
+            'catatan.required_if' => 'Catatan wajib diisi jika status ditolak atau revisi.',
         ];
     }
 }

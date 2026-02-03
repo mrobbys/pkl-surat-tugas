@@ -55,30 +55,31 @@
         @can('view activity log')
             {{-- activity log start --}}
             <x-sidebar-link href="{{ route('activity-logs.index') }}"
-                icon="ri-archive-stack-fill"
+                icon="ri-history-fill"
                 colorIcon="text-[#8B5CF6]">
                 Activity Logs
             </x-sidebar-link>
             {{-- activity log end --}}
         @endcan
 
-        {{-- todo: tambahkan permission untuk view reports --}}
         {{-- reports start --}}
-            <x-sidebar-link href=""
-                icon="ri-bar-chart-fill"
+        @can('view reports')
+            <x-sidebar-link href="{{ route('reports.index') }}"
+                icon="ri-printer-fill"
                 colorIcon="text-[#F97316]">
-                Laporan Staf
+                Laporan
             </x-sidebar-link>
             {{-- reports end --}}
+        @endcan
 
-            {{-- surat perjalanan dinas start --}}
-            @can('view telaah staf')
-                <x-sidebar-link href="{{ route('surat.index') }}"
-                    icon="ri-file-list-3-fill"
-                    colorIcon="text-[#EF4444]">
-                    Surat Tugas
-                </x-sidebar-link>
-            @endcan
-            {{-- surat perjalanan dinas end --}}
-        </div>
-    </nav>
+        {{-- surat perjalanan dinas start --}}
+        @can('view telaah staf')
+            <x-sidebar-link href="{{ route('surat.index') }}"
+                icon="ri-file-list-3-fill"
+                colorIcon="text-[#EF4444]">
+                Surat Tugas
+            </x-sidebar-link>
+        @endcan
+        {{-- surat perjalanan dinas end --}}
+    </div>
+</nav>

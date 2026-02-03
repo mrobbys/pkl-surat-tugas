@@ -24,7 +24,7 @@ export const deleteMethods = {
         const payload = {
           _method: 'DELETE',
         };
-        
+
         const response = await fetch(this.config.deleteUrl.replace('__ID__', id), {
           method: 'POST',
           headers: {
@@ -36,21 +36,18 @@ export const deleteMethods = {
         });
 
         const data = await response.json();
-        if (response.ok) {
-          Swal.fire({
-            icon: data.icon,
-            title: data.title,
-            text: data.text,
-            timer: 5000,
-          });
-          this.dataTable.ajax.reload();
-        } else {
-          Swal.fire({
-            icon: data.icon,
-            title: data.title,
-            text: data.text,
-          });
+
+        if (!response.ok) {
+          throw new Error(data.text || 'Gagal menghapus surat.')
         }
+
+        await Swal.fire({
+          icon: data.icon,
+          title: data.title,
+          text: data.text,
+          timer: 5000,
+        });
+        this.dataTable.ajax.reload();
       } catch (error) {
         console.error('Error deleting telaah staf:', error);
         Swal.fire({

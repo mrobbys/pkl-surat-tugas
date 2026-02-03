@@ -18,7 +18,9 @@
 
     <div class="relative mb-20 mt-10 overflow-hidden rounded-xl bg-white px-4 shadow-xl"
         x-data="activityManager(@js($config))"
-        x-init="fetchActivities()">
+        x-init="fetchActivities()"
+        x-on:alpine-destroy.window="destroy()"
+        >
         <div class="w-full">
 
             {{-- table --}}
