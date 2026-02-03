@@ -24,7 +24,11 @@
                 Kembali
             </a>
             {{-- edit button, muncul ketika mode show --}}
-            @if ($mode === 'show' && $surat->status !== 'disetujui_kadis' && $surat->status !== 'ditolak_kabid' && $surat->status !== 'ditolak_kadis')
+            @if (
+                $mode === 'show' &&
+                    $surat->status !== 'disetujui_kadis' &&
+                    $surat->status !== 'ditolak_kabid' &&
+                    $surat->status !== 'ditolak_kadis')
                 @can('edit telaah staf')
                     <a href="{{ route('telaah-staf.edit', $surat->id) }}"
                         class="flex cursor-pointer items-center justify-center gap-1 rounded-lg bg-blue-500 px-4 py-2 font-semibold text-white shadow-sm transition-all duration-300 hover:bg-blue-600 focus:outline-none">
@@ -35,7 +39,8 @@
             @endif
         </div>
 
-        <form x-cloak @submit.prevent="saveTelaahStaf()">
+        <form x-cloak
+            @submit.prevent="saveTelaahStaf()">
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 {{-- input kepada_yth start --}}
                 <x-input-form-modal id="kepada_yth"
@@ -75,12 +80,13 @@
                 <x-input-form-modal id="tanggal_telaahan"
                     label="Tanggal Telaahan"
                     name="tanggal_telaahan"
-                    type="date"
-                    placeholder="Masukkan Tanggal Telaahan"
+                    type="text"
+                    placeholder="Pilih tanggal telaahan"
                     x-model="form.tanggal_telaahan"
                     x-bind:disabled="mode === 'show'"
                     isShowMode="mode !== 'show'"
                     :mode="$mode" />
+
                 {{-- input tanggal_telaahan end --}}
 
                 {{-- input perihal_kegiatan start --}}
@@ -110,8 +116,8 @@
                 <x-input-form-modal id="tanggal_mulai"
                     label="Tanggal Mulai"
                     name="tanggal_mulai"
-                    type="date"
-                    placeholder="Masukkan Tanggal Mulai Kegiatan"
+                    type="text"
+                    placeholder="Pilih tanggal mulai kegiatan"
                     x-model="form.tanggal_mulai"
                     x-bind:disabled="mode === 'show'"
                     isShowMode="mode !== 'show'"
@@ -122,8 +128,8 @@
                 <x-input-form-modal id="tanggal_selesai"
                     label="Tanggal Selesai"
                     name="tanggal_selesai"
-                    type="date"
-                    placeholder="Masukkan Tanggal Selesai Kegiatan"
+                    type="text"
+                    placeholder="Pilih tanggal selesai kegiatan"
                     x-model="form.tanggal_selesai"
                     x-bind:disabled="mode === 'show'"
                     isShowMode="mode !== 'show'"

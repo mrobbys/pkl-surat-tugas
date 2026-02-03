@@ -4,12 +4,32 @@ namespace App\Models;
 
 use Illuminate\Support\Facades\Auth;
 use App\Traits\LogsActivityWithIp;
+use Illuminate\Support\Facades\Cache;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Permission\Models\Role as SpatieRole;
 
 class Role extends SpatieRole
 {
   use LogsActivityWithIp;
+
+  protected static function boot()
+  {
+    parent::boot();
+
+    // clear cache
+    static::saved(function ($role) {
+      self::clearRoleRelatedCache();
+    });
+    static::deleted(function ($role) {
+      self::clearRoleRelatedCache();
+    });
+  }
+
+  private static function clearRoleRelatedCache()
+  {
+    Cache::forget('roles_list_exclude_superadmin');
+    Cache::forget('permissions_grouped');
+  }
 
   /**
    * konfigurasi activity log untuk Role

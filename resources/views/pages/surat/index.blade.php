@@ -19,7 +19,9 @@
 
     <div class="relative mb-20 mt-10 overflow-hidden rounded-xl bg-white p-4 shadow-xl"
         x-data="telaahStafManager(@js($config))"
-        x-init="fetchTelaahStaf()">
+        x-init="fetchTelaahStaf()"
+        x-on:alpine-destroy.window="destroy()"
+        >
         <div class="w-full">
             @can('create telaah staf')
                 <div class="my-4 flex justify-end">

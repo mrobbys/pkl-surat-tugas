@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRoleRequest extends FormRequest
@@ -15,22 +16,40 @@ class UpdateRoleRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * Prepare data before validation
      */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'name' => trim($this->name),
+        ]);
+    }
+
     public function rules(): array
     {
-        $id = $this->role?->id ?? null;
+        $roleId = $this->route('role')->id;
+
         return [
             'name' => [
                 'required',
                 'string',
                 'min:3',
-                'unique:roles,name,' . $id,
+                'max:50',
+                Rule::unique('roles', 'name')
+                    ->ignore($roleId)
+                    ->whereNotIn('name', ['super-admin']),
                 'regex:/^[a-z0-9]+(-[a-z0-9]+)*$/',
             ],
-            'permissions' => 'required|min:1|array',
+            'permissions' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+            'permissions.*' => [
+                'required',
+                'integer',
+                'exists:permissions,id',
+            ],
         ];
     }
 
@@ -38,14 +57,16 @@ class UpdateRoleRequest extends FormRequest
     {
         return [
             'name.required' => 'Nama role wajib diisi.',
-            'name.string' => 'Nama role harus berupa string.',
+            'name.string' => 'Nama role harus berupa teks.',
             'name.min' => 'Nama role minimal 3 karakter.',
+            'name.max' => 'Nama role maksimal 50 karakter.',
             'name.unique' => 'Nama role sudah digunakan.',
-            'name.regex' => 'Nama role hanya boleh mengandung huruf kecil, angka, dan tanda hubung (-), serta tidak boleh diawali atau diakhiri dengan tanda hubung.',
-            
-            'permissions.required' => 'Permissions harus dipilih minimal 1.',
-            'permissions.min' => 'Permissions harus dipilih minimal 1.',
-            'permissions.array' => 'Permissions harus berupa array.',
+            'name.regex' => 'Format nama role tidak valid. Gunakan huruf kecil, angka, dan tanda hubung (-).',
+
+            'permissions.required' => 'Pilih minimal 1 permission.',
+            'permissions.array' => 'Format permissions tidak valid.',
+            'permissions.min' => 'Pilih minimal 1 permission.',
+            'permissions.*.exists' => 'Permission tidak valid.',
         ];
     }
 }

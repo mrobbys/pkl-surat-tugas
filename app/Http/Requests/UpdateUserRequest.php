@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -16,21 +17,78 @@ class UpdateUserRequest extends FormRequest
     }
 
     /**
+     * Prepare data before validation
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'nama_lengkap' => trim($this->nama_lengkap),
+            'email' => strtolower(trim($this->email)),
+            'jabatan' => trim($this->jabatan),
+            'nip' => trim($this->nip),
+        ]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        $id = $this->user?->id ?? null;
+        $userId = $this->route('user')->id;
+
         return [
-            'nip' => 'required|digits:18|unique:users,nip,' . $id,
-            'nama_lengkap' => 'required|string|regex:/^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s.,\'"-]*[A-Za-zÀ-ÿ.,]$/u|min:3|max:255',
-            'email' => 'required|email:dns|unique:users,email,' . $id,
-            'password' => ['nullable', 'string', Password::min(8)->max(100)->mixedCase()->numbers()->symbols()],
-            'roles' => 'required|array|min:1|exists:roles,id',
-            'pangkat_golongan_id' => 'required|exists:pangkat_golongans,id',
-            'jabatan' => 'required|string|min:3|max:255|regex:/^[a-zA-Z\s]+$/',
+            'nip' => [
+                'required',
+                'digits:18',
+                Rule::unique('users', 'nip')->ignore($userId),
+                'regex:/^[0-9]{18}$/',
+            ],
+            'nama_lengkap' => [
+                'required',
+                'string',
+                'min:3',
+                'max:255',
+                'regex:/^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s.,\'"-]*[A-Za-zÀ-ÿ.,]$/u',
+            ],
+            'email' => [
+                'required',
+                'email:rfc,dns',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($userId),
+            ],
+            'password' => [
+                'nullable',
+                'string',
+                Password::min(8)
+                    ->max(100)
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+            ],
+            'roles' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+            'roles.*' => [
+                'required',
+                'integer',
+                'exists:roles,id',
+            ],
+            'pangkat_golongan_id' => [
+                'required',
+                'integer',
+                'exists:pangkat_golongans,id',
+            ],
+            'jabatan' => [
+                'required',
+                'string',
+                'min:3',
+                'max:255',
+                'regex:/^[A-Za-z\s\/\-]+$/',
+            ],
         ];
     }
 
@@ -40,6 +98,7 @@ class UpdateUserRequest extends FormRequest
             'nip.required' => 'NIP wajib diisi.',
             'nip.digits' => 'NIP harus terdiri dari 18 digit angka.',
             'nip.unique' => 'NIP sudah digunakan.',
+            'nip.regex' => 'NIP hanya boleh berisi angka.',
 
             'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
             'nama_lengkap.string' => 'Nama lengkap harus berupa string.',
@@ -49,8 +108,10 @@ class UpdateUserRequest extends FormRequest
 
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
+            'email.rfc' => 'Format email tidak valid.',
             'email.dns' => 'Domain email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
+            'email.max' => 'Email tidak boleh lebih dari 255 karakter.',
 
             'password.string' => 'Password harus berupa string.',
             'password.min' => 'Password harus terdiri dari minimal 8 karakter.',

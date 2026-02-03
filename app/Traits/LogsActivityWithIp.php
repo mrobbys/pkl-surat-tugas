@@ -2,7 +2,6 @@
 
 namespace App\Traits;
 
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 trait LogsActivityWithIp

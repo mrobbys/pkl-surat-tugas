@@ -4,13 +4,17 @@ namespace App\Services;
 
 use Mpdf\Mpdf;
 use App\Models\User;
+use Mpdf\MpdfException;
 use Illuminate\Support\Facades\DB;
 use App\Models\SuratPerjalananDinas;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Cache;
 
 class SuratPerjalananDinasService
 {
+  // final status
+  private const FINAL_STATUSES = ['disetujui_kadis', 'ditolak_kabid', 'ditolak_kadis'];
+
   /**
    * Ambil semua data surat untuk datatables
    * 
@@ -20,7 +24,7 @@ class SuratPerjalananDinasService
   {
     // query semua data surat perjalanan dinas
     // $query = SuratPerjalananDinas::with(['pembuat']);
-    $query = SuratPerjalananDinas::select(['id','nomor_telaahan', 'tanggal_telaahan', 'pembuat_id', 'status'])->with('pembuat:id,nama_lengkap');
+    $query = SuratPerjalananDinas::select(['id', 'nomor_telaahan', 'tanggal_telaahan', 'pembuat_id', 'status'])->with('pembuat:id,nama_lengkap');
 
     // filter berdasarkan user yang sedang login
     $user = Auth::user();
@@ -43,11 +47,14 @@ class SuratPerjalananDinasService
   public function getPegawaisForSelect()
   {
     // ambil data user yang bukan super-admin dan urutkan berdasarkan id asc
-    return User::whereDoesntHave('roles', function ($q) {
-      $q->where('name', 'super-admin');
-    })
-      ->orderBy('id', 'asc')
-      ->get();
+    return Cache::remember('pegawai_list', 86400, function () {
+      return User::select(['id', 'nama_lengkap', 'nip'])
+        ->whereDoesntHave('roles', function ($q) {
+          $q->where('name', 'super-admin');
+        })
+        ->orderBy('nama_lengkap', 'asc')
+        ->get();
+    });
   }
 
   /**
@@ -93,6 +100,16 @@ class SuratPerjalananDinasService
    */
   public function getTelaahStafDetail(SuratPerjalananDinas $surat)
   {
+    // cek apakah user yang sedang login adalah pembuat surat
+    // kecuali untuk role = super-admin, permission = 'approve telaah staf level 1', 'approve telaah staf level 2'
+    $user = Auth::user();
+    $isOwner = $surat->pembuat_id === $user->id;
+    $isApprover = $user->hasAnyPermission(['approve telaah staf level 1', 'approve telaah staf level 2']);
+    $isSuperAdmin = $user->hasRole('super-admin');
+    if (!$isOwner && !$isApprover && !$isSuperAdmin) {
+      abort(403, 'Anda tidak memiliki akses untuk melihat detail surat ini.');
+    }
+
     // ammbil data surat dengan relasi pegawaiDitugaskan dan pembuat
     $surat->load(['pegawaiDitugaskan.pangkatGolongan', 'pembuat', 'penyetujuSatu', 'penyetujuDua']);
 
@@ -203,12 +220,7 @@ class SuratPerjalananDinasService
       'status' => $this->calculateGlobalStatus($surat->status_penyetuju_dua, $statusPenyetujuSatu),
     ]);
 
-    // buat pesan status berdasarkan status penyetuju satu
-    return match ($statusPenyetujuSatu) {
-      'disetujui' => 'Disetujui',
-      'ditolak' => 'Ditolak',
-      'revisi' => 'Dikembalikan untuk direvisi',
-    };
+    return $this->getApprovalMessage($statusPenyetujuSatu);
   }
 
   /**
@@ -239,19 +251,14 @@ class SuratPerjalananDinasService
 
       // jika status akhir adalah disetujui_kadis dan nomor_surat_tugas belum ada, isi nomor surat tugas
       if ($statusGlobal === 'disetujui_kadis' && !$surat->nomor_surat_tugas) {
-        $updateData['nomor_nota_dinas'] = $this->generateNomorNotaDinas();
-        $updateData['nomor_surat_tugas'] = $this->generateNomorSuratTugas();
+        $updateData['nomor_nota_dinas'] = $this->generateNomorSurat('nota_dinas');
+        $updateData['nomor_surat_tugas'] = $this->generateNomorSurat('surat_tugas');
       }
 
       // update semua data sekaligus (1 query)
       $surat->update($updateData);
 
-      // buat pesan status berdasarkan status penyetuju dua
-      return match ($statusPenyetujuDua) {
-        'disetujui' => 'Disetujui',
-        'ditolak' => 'Ditolak',
-        'revisi' => 'Dikembalikan untuk direvisi',
-      };
+      return $this->getApprovalMessage($statusPenyetujuDua);
     });
   }
 
@@ -267,25 +274,7 @@ class SuratPerjalananDinasService
     // load relasi
     $surat->load(['pegawaiDitugaskan.pangkatGolongan', 'pembuat', 'pembuat.pangkatGolongan']);
 
-    // inisialisasi mpdf
-    $mpdf = new Mpdf([
-      'format' => 'A4',
-      'orientation' => 'P',
-      'margin_left' => 10,
-      'margin_right' => 10,
-      'margin_top' => 10,
-      'margin_bottom' => 10,
-    ]);
-
-    // render view untuk PDF
-    $html = view('pdf.telaah-staf', compact('surat'))->render();
-    $mpdf->WriteHTML($html);
-
-    // generate nama file : Telaah_Staf_[nomor_telaahan]_[tanggal].pdf
-    $filename = 'Telaah_Staf_' . $surat->nomor_telaahan . '_' . date('d-m-Y') . '.pdf';
-
-    // kembalikan output PDF ke browser
-    return $mpdf->Output($filename, 'I');
+    return $this->generatePDF($surat, 'pdf.telaah-staf', 'Telaah_Staf');
   }
 
   /**
@@ -301,25 +290,11 @@ class SuratPerjalananDinasService
       throw new \Exception('Nomor Nota Dinas belum diisi.');
     }
 
-    // inisialisasi mpdf
-    $mpdf = new Mpdf([
-      'format' => 'A4',
-      'orientation' => 'P',
-      'margin_left' => 10,
-      'margin_right' => 10,
-      'margin_top' => 10,
-      'margin_bottom' => 10,
-    ]);
+    if ($surat->status !== 'disetujui_kadis') {
+      throw new \InvalidArgumentException('Nota Dinas hanya dapat dicetak setelah disetujui oleh Kadis.');
+    }
 
-    // render view untuk PDF
-    $html = view('pdf.nota-dinas', compact('surat'))->render();
-    $mpdf->WriteHTML($html);
-
-    // generate nama file
-    $filename = 'Nota_Dinas_' . $surat->nomor_nota_dinas . '_' . date('d-m-Y') . '.pdf';
-
-    // kembalikan output PDF ke browser
-    return $mpdf->Output($filename, 'I');
+    return $this->generatePDF($surat, 'pdf.nota-dinas', 'Nota_Dinas', $surat->nomor_nota_dinas);
   }
 
   /**
@@ -332,31 +307,54 @@ class SuratPerjalananDinasService
   public function generatePDFSuratTugas(SuratPerjalananDinas $surat)
   {
     if (!$surat->nomor_surat_tugas) {
-      throw new \Exception('Nomor Surat Tugas belum diisi.');
+      throw new \Exception('Nomor Surat Tugas belum diterbitkan.');
+    }
+
+    if ($surat->status !== 'disetujui_kadis') {
+      throw new \InvalidArgumentException('Surat Tugas hanya dapat dicetak setelah disetujui oleh Kadis.');
     }
 
     // load relasi
     $surat->load(['pegawaiDitugaskan.pangkatGolongan']);
 
-    // inisialisasi mpdf
-    $mpdf = new Mpdf([
-      'format' => 'A4',
-      'orientation' => 'P',
-      'margin_left' => 10,
-      'margin_right' => 10,
-      'margin_top' => 10,
-      'margin_bottom' => 10,
-    ]);
+    return $this->generatePDF($surat, 'pdf.surat-tugas', 'Surat_Tugas', $surat->nomor_surat_tugas);
+  }
 
-    // render view untuk PDF
-    $html = view('pdf.surat-tugas', compact('surat'))->render();
-    $mpdf->WriteHTML($html);
+  private function generatePDF(SuratPerjalananDinas $surat, string $viewFile, string $filePrefix, ?string $nomorSurat = null)
+  {
+    try {
+      $mpdf = new Mpdf([
+        'format' => 'A4',
+        'orientation' => 'P',
+        'margin_left' => 10,
+        'margin_right' => 10,
+        'margin_top' => 10,
+        'margin_bottom' => 10,
+      ]);
 
-    // generate nama file : Surat_Tugas_[nomor_surat_tugas]_[tanggal].pdf
-    $filename = 'Surat_Tugas_' . $surat->nomor_surat_tugas . '_' . date('d-m-Y') . '.pdf';
+      $html = view($viewFile, compact('surat'))->render();
+      $mpdf->WriteHTML($html);
 
-    // kembalikan output PDF ke browser
-    return $mpdf->Output($filename, 'I');
+      $nomorForFile = $nomorSurat ?? $surat->nomor_telaahan;
+      $filename = "{$filePrefix}_{$nomorForFile}_" . date('d-m-Y') . '.pdf';
+
+      return response($mpdf->Output($filename, 'I'))
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', 'inline; filename="' . $filename . '"');
+    } catch (MpdfException $e) {
+      throw new \Exception('Gagal generate PDF: ' . $e->getMessage());
+    }
+  }
+
+  /**
+   * Cek apakah status surat adalah final status
+   * @param SuratPerjalananDinas $surat
+   * 
+   * @return bool
+   */
+  public function isFinalStatus(SuratPerjalananDinas $surat)
+  {
+    return in_array($surat->status, self::FINAL_STATUSES);
   }
 
   /**
@@ -367,36 +365,43 @@ class SuratPerjalananDinasService
    * 
    * @return string
    */
-  private function calculateGlobalStatus($statusPenyetujuDua, $statusPenyetujuSatu)
+  private function calculateGlobalStatus(?string $statusPenyetujuDua, ?string $statusPenyetujuSatu)
   {
-    // status ditolak
-    if ($statusPenyetujuSatu === 'ditolak') {
-      return 'ditolak_kabid';
-    }
-    if ($statusPenyetujuDua === 'ditolak') {
-      return 'ditolak_kadis';
-    }
+    // Ditolak
+    if ($statusPenyetujuSatu === 'ditolak') return 'ditolak_kabid';
+    if ($statusPenyetujuDua === 'ditolak') return 'ditolak_kadis';
 
-    // status revisi
-    if ($statusPenyetujuSatu === 'revisi') {
-      return 'revisi_kabid';
-    }
-    if ($statusPenyetujuDua === 'revisi') {
-      return 'revisi_kadis';
-    }
+    // Revisi
+    if ($statusPenyetujuSatu === 'revisi') return 'revisi_kabid';
+    if ($statusPenyetujuDua === 'revisi') return 'revisi_kadis';
 
-    // jika keduanya mensetujui -> disetujui kadis (surat tugas siap diterbitkan)
+    // Disetujui keduanya
     if ($statusPenyetujuSatu === 'disetujui' && $statusPenyetujuDua === 'disetujui') {
       return 'disetujui_kadis';
     }
 
-    // jika penyetuju satu mensetujui, tapi penyetuju dua masih pending -> disetujui kabid
+    // Disetujui level 1, pending level 2
     if ($statusPenyetujuSatu === 'disetujui' && $statusPenyetujuDua === 'pending') {
       return 'disetujui_kabid';
     }
 
-    // jika keduanya masih pending -> diajukan
     return 'diajukan';
+  }
+
+  /**
+   * Buat pesan approval berdasarkan status
+   * @param string $status
+   * 
+   * @return string
+   */
+  private function getApprovalMessage(string $status)
+  {
+    return match ($status) {
+      'disetujui' => 'Disetujui',
+      'ditolak' => 'Ditolak',
+      'revisi' => 'Dikembalikan untuk direvisi',
+      default => 'Diproses',
+    };
   }
 
   /**
@@ -414,66 +419,31 @@ class SuratPerjalananDinasService
   }
 
   /**
-   * Generate nomor nota dinas dengan format increment per tahun
+   * Generate nomor surat dengan format increment per tahun
    * Format: 0001/YYYY, 0002/YYYY, dst.
+   * @param string $type
    * 
    * @return string
    */
-  private function generateNomorNotaDinas()
+  private function generateNomorSurat(string $type)
   {
-    $tahunSekarang = date('Y');
+    $tahun = date('Y');
+    $columnName = $type === 'nota_dinas' ? 'nomor_nota_dinas' : 'nomor_surat_tugas';
 
-    // cari nomor terakhir di tahun yang sama
-    $suratTerakhir = SuratPerjalananDinas::whereNotNull('nomor_nota_dinas')
-      // cari surat yang sudah memiliki nomor_nota_dinas
-      ->whereYear('created_at', $tahunSekarang)
-      // urutkan dari yang terbaru
-      ->orderBy('id', 'desc')
+    // ✅ Use lockForUpdate untuk prevent race condition
+    $suratTerakhir = SuratPerjalananDinas::whereNotNull($columnName)
+      ->whereYear('created_at', $tahun)
+      ->orderByDesc('id')
+      ->lockForUpdate()
       ->first();
 
-    // jika belum ada surat di tahun ini, mulai dari 1
-    if (!$suratTerakhir) {
-      $nomorUrut = 1;
-    } else {
-      // extract nomor urut dari nomor nota dinas terakhir
-      // format: 0001/2025 -> ambil 0001
-      preg_match('/(\d+)\/\d{4}/', $suratTerakhir->nomor_nota_dinas, $matches);
+    $nomorUrut = 1;
+
+    if ($suratTerakhir) {
+      preg_match('/(\d+)\/\d{4}/', $suratTerakhir->{$columnName}, $matches);
       $nomorUrut = isset($matches[1]) ? intval($matches[1]) + 1 : 1;
     }
 
-    // format nomor dengan 4 digit
-    return sprintf('%04d/%s', $nomorUrut, $tahunSekarang);
-  }
-
-  /**
-   * Generate nomor surat tugas dengan format increment per tahun
-   * Format: 0001/YYYY, 0002/YYYY, dst.
-   * 
-   * @return string
-   */
-  private function generateNomorSuratTugas()
-  {
-    $tahunSekarang = date('Y');
-
-    // cari nomor terakhir di tahun yang sama
-    $suratTerakhir = SuratPerjalananDinas::whereNotNull('nomor_surat_tugas')
-      // cari surat yang sudah memiliki nomor_surat_tugas
-      ->whereYear('created_at', $tahunSekarang)
-      // urutkan dari yang terbaru
-      ->orderBy('id', 'desc')
-      ->first();
-
-    // jika belum ada surat di tahun ini, mulai dari 1
-    if (!$suratTerakhir) {
-      $nomorUrut = 1;
-    } else {
-      // extract nomor urut dari nomor surat terakhir
-      // format: 0001/2025 -> ambil 0001
-      preg_match('/(\d+)\/\d{4}/', $suratTerakhir->nomor_surat_tugas, $matches);
-      $nomorUrut = isset($matches[1]) ? intval($matches[1]) + 1 : 1;
-    }
-
-    // format nomor dengan 4 digit
-    return sprintf('%04d/%s', $nomorUrut, $tahunSekarang);
+    return sprintf('%04d/%s', $nomorUrut, $tahun);
   }
 }

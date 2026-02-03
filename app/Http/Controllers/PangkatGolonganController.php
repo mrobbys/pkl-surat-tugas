@@ -32,9 +32,15 @@ class PangkatGolonganController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            // ambil semua data pangkat golongan via service
-            $data = $this->pangkatGolonganService->getAllPangkatGolongans();
-            return response()->json(['data' => $data]);
+            try {
+                $data = $this->pangkatGolonganService->getAllPangkatGolongans();
+                return response()->json(['data' => $data]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Gagal mengambil data pangkat golongan.'
+                ], 500);
+            }
         }
         return view('pages.pangkat-golongan.index');
     }
@@ -59,10 +65,8 @@ class PangkatGolonganController extends Controller
         }
 
         try {
-            // validasi request di StorePangkatGolonganRequest
-            $data = $request->validated();
             // simpan data pangkat golongan via service
-            $this->pangkatGolonganService->storePangkatGolongan($data);
+            $this->pangkatGolonganService->storePangkatGolongan($request->validated());
 
             // kembalikan response json jika berhasil
             return response()->json([
@@ -72,13 +76,12 @@ class PangkatGolonganController extends Controller
                 'text' => 'Pangkat dan Golongan berhasil ditambahkan!'
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Error creating PangkatGolongan: ' . $e->getMessage());
             // kembalikan response json jika error
             return response()->json([
                 'status' => 'error',
                 'icon' => 'error',
                 'title' => 'Gagal',
-                'text' => 'Gagal menambahkan Pangkat dan Golongan.' . $e->getMessage(),
+                'text' => 'Gagal menambahkan Pangkat dan Golongan. Silahkan coba lagi.',
             ], 500);
         }
     }
@@ -92,11 +95,16 @@ class PangkatGolonganController extends Controller
      */
     public function edit(PangkatGolongan $pangkatGolongan)
     {
-        // ambil data pangkat golongan via service
-        $pg = $this->pangkatGolonganService->getPangkatGolonganForEdit($pangkatGolongan);
-        return response()->json([
-            'data' => $pg
-        ]);
+        try {
+            // ambil data pangkat golongan via service
+            $data = $this->pangkatGolonganService->getPangkatGolonganForEdit($pangkatGolongan);
+            return response()->json(['data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mengambil data untuk edit.'
+            ], 500);
+        }
     }
 
     /**
@@ -120,10 +128,8 @@ class PangkatGolonganController extends Controller
         }
 
         try {
-            // validasi request di UpdatePangkatGolonganRequest
-            $data = $request->validated();
             // update data pangkat golongan via service
-            $this->pangkatGolonganService->updatePangkatGolongan($pangkatGolongan, $data);
+            $this->pangkatGolonganService->updatePangkatGolongan($pangkatGolongan, $request->validated());
 
             // kembalikan response json jika berhasil
             return response()->json([
@@ -139,7 +145,7 @@ class PangkatGolonganController extends Controller
                 'status' => 'error',
                 'icon' => 'error',
                 'title' => 'Gagal',
-                'text' => 'Gagal memperbarui Pangkat dan Golongan. ' . $e->getMessage(),
+                'text' => 'Gagal memperbarui Pangkat dan Golongan. Silahkan coba lagi.',
             ], 500);
         }
     }
@@ -174,13 +180,17 @@ class PangkatGolonganController extends Controller
                 'text' => 'Pangkat dan Golongan berhasil dihapus!'
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error deleting PangkatGolongan: ' . $e->getMessage());
+            // cek apakah error karena pangkat golongan masih digunakan
+            $errorMessage = str_contains($e->getMessage(), 'masih digunakan')
+                ? $e->getMessage()
+                : 'Gagal menghapus Pangkat dan Golongan. Silakan coba lagi.';
+
             return response()->json([
                 'status' => 'error',
                 'icon' => 'error',
                 'title' => 'Gagal',
-                'text' => 'Gagal menghapus Pangkat dan Golongan. ' . $e->getMessage(),
-            ], 500);
+                'text' => $errorMessage,
+            ], 422);
         }
     }
 }

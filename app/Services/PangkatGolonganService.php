@@ -13,8 +13,8 @@ class PangkatGolonganService
    */
   public function getAllPangkatGolongans()
   {
-    // ambil data pangkat golongan dan urutkan berdasarkan created_at desc. jika nilai created_at sama maka urutkan berdasarkan id asc
-    return PangkatGolongan::orderByDesc('created_at')->orderBy('id', 'asc')->get();
+    // ambil data pangkat golongan dan urutkan berdasarkan id asc
+    return PangkatGolongan::orderBy('id', 'desc')->get();
   }
 
   /**

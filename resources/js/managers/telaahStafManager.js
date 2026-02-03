@@ -5,6 +5,7 @@ import { telaahStafFormMethods } from '../surat/telaahStafForm.js'
 import { approveTelaahStaf } from '../surat/approveTelaahStaf.js';
 import { submitApproveTelaahStaf } from '../surat/submitApproveTelaahStaf.js';
 import { deleteMethods } from '../surat/delete.js';
+import { sanitizeString } from '../utils/sanitizeString.js'
 
 export function telaahStafManager(config) {
   return {
@@ -17,11 +18,18 @@ export function telaahStafManager(config) {
     // Simpan config dari Blade agar bisa diakses sebagai `this.config`
     config: config,
 
+    datTable: null,
+    
     // Gabungkan semua method
     ...indexMethods,
     ...approveTelaahStaf,
     ...submitApproveTelaahStaf,
     ...deleteMethods,
+
+    // sanitize string
+    sanitizeString(str) {
+      return sanitizeString(str);
+    },
 
     resetApproveForm() {
       this.approveForm = {
@@ -47,6 +55,18 @@ export function telaahStafManager(config) {
       this.isShowMode = false;
     },
 
+    // cleanup
+    destroy() {
+      this.destroyDataTable();
+    },
+
+    // destory datatable
+    destroyDataTable() {
+      if (this.dataTable) {
+        this.dataTable.destroy();
+        this.dataTable = null;
+      }
+    }
   }
 }
 
@@ -57,7 +77,7 @@ export function telaahStafForm(mode, surat, data, formConfig) {
     suratId: surat?.id || null,
 
     editingId: mode === 'edit' ? surat?.id : null,
-    
+
     form: {
       kepada_yth: data?.kepada_yth || '',
       dari: data?.dari || '',

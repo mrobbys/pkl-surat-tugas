@@ -10,4 +10,5 @@ require __DIR__ . '/auth.php';
 require __DIR__ . '/dashboard.php';
 require __DIR__ . '/master.php';
 require __DIR__ . '/activity.php';
+require __DIR__ . '/reports.php';
 require __DIR__ . '/surat.php';

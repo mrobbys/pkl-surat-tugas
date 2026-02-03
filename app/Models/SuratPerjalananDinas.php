@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 use App\Traits\LogsActivityWithIp;
 use Spatie\Activitylog\LogOptions;
-
-use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SuratPerjalananDinas extends Model
 {
-    use LogsActivityWithIp;
+    use LogsActivityWithIp, HasFactory;
 
     protected $guarded = [];
 
@@ -38,7 +38,8 @@ class SuratPerjalananDinas extends Model
                 'penyetuju_dua_id'
             ])
             ->logOnlyDirty()
-            ->useLogName('surat_perjalanan_dinas')
+            ->dontSubmitEmptyLogs()
+            ->useLogName('surat')
             ->setDescriptionForEvent(fn(string $eventName) => $this->generateDescription($eventName));
     }
 
@@ -49,22 +50,12 @@ class SuratPerjalananDinas extends Model
     {
         $nomorSurat = $this->nomor_telaahan ?? 'Unknown';
 
-        // Handle created event
-        if ($eventName === 'created') {
-            return "Surat: {$nomorSurat} telah dibuat";
-        }
-
-        // Handle deleted event
-        if ($eventName === 'deleted') {
-            return "Surat: {$nomorSurat} telah dihapus";
-        }
-
-        // Handle updated event - check specific changes
-        if ($eventName === 'updated') {
-            return $this->getUpdateDescription($nomorSurat);
-        }
-
-        return "Surat: {$nomorSurat} telah di-{$eventName}";
+        return match ($eventName) {
+            'created' => "Surat: {$nomorSurat} telah dibuat",
+            'deleted' => "Surat: {$nomorSurat} telah dihapus",
+            'updated' => $this->getUpdateDescription($nomorSurat),
+            default => "Surat: {$nomorSurat} telah di-{$eventName}",
+        };
     }
 
     /**

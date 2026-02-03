@@ -16,6 +16,19 @@ class StoreUserRequest extends FormRequest
     }
 
     /**
+     * Prepare data before validation
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'nama_lengkap' => trim($this->nama_lengkap),
+            'email' => strtolower(trim($this->email)),
+            'jabatan' => trim($this->jabatan),
+            'nip' => trim($this->nip),
+        ]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -23,13 +36,56 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nip' => 'required|digits:18|unique:users,nip',
-            'nama_lengkap' => 'required|string|regex:/^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s.,\'"-]*[A-Za-zÀ-ÿ.,]$/u|min:3|max:255',
-            'email' => 'required|email:dns|unique:users,email',
-            'password' => ['required', 'string', Password::min(8)->max(100)->mixedCase()->numbers()->symbols()],
-            'roles' => 'required|array|min:1|exists:roles,id',
-            'pangkat_golongan_id' => 'required|exists:pangkat_golongans,id',
-            'jabatan' => 'required|string|min:3|max:255|regex:/^[a-zA-Z\s]+$/',
+            'nip' => [
+                'required',
+                'digits:18',
+                'unique:users,nip',
+                'regex:/^[0-9]{18}$/',
+            ],
+            'nama_lengkap' => [
+                'required',
+                'string',
+                'min:3',
+                'max:255',
+                'regex:/^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s.,\'"-]*[A-Za-zÀ-ÿ.,]$/u',
+            ],
+            'email' => [
+                'required',
+                'email:rfc,dns',
+                'max:255',
+                'unique:users,email',
+            ],
+            'password' => [
+                'required',
+                'string',
+                Password::min(8)
+                    ->max(100)
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols(),
+            ],
+            'roles' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+            'roles.*' => [
+                'required',
+                'integer',
+                'exists:roles,id',
+            ],
+            'pangkat_golongan_id' => [
+                'required',
+                'integer',
+                'exists:pangkat_golongans,id',
+            ],
+            'jabatan' => [
+                'required',
+                'string',
+                'min:3',
+                'max:255',
+                'regex:/^[A-Za-z\s\/\-]+$/',
+            ],
         ];
     }
 
@@ -39,6 +95,7 @@ class StoreUserRequest extends FormRequest
             'nip.required' => 'NIP wajib diisi.',
             'nip.digits' => 'NIP harus terdiri dari 18 digit angka.',
             'nip.unique' => 'NIP sudah digunakan.',
+            'nip.regex' => 'NIP hanya boleh berisi angka.',
 
             'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
             'nama_lengkap.string' => 'Nama lengkap harus berupa string.',
@@ -48,7 +105,9 @@ class StoreUserRequest extends FormRequest
 
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
+            'email.rfc' => 'Format email tidak valid.',
             'email.dns' => 'Domain email tidak valid.',
+            'email.max' => 'Email tidak boleh lebih dari 255 karakter.',
             'email.unique' => 'Email sudah digunakan.',
 
             'password.required' => 'Password wajib diisi.',

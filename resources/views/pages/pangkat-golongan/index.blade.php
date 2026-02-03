@@ -15,6 +15,7 @@
         class="relative mt-10 mb-20 overflow-hidden rounded-xl bg-white p-4 shadow-xl"
         x-data="pangkatGolonganManager(@js($config))"
         x-init="fetchPangkatGolongans()"
+        x-on:alpine-destroy.window="destroy()"
     >
         <div class="w-full">
             @can("create pangkat golongan")

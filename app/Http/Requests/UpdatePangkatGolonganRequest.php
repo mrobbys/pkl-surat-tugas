@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdatePangkatGolonganRequest extends FormRequest
@@ -15,17 +16,47 @@ class UpdatePangkatGolonganRequest extends FormRequest
     }
 
     /**
+     * Prepare data before validation (sanitize input)
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'pangkat' => trim($this->pangkat),
+            'golongan' => strtoupper(trim($this->golongan)),
+            'ruang' => strtolower(trim($this->ruang)),
+        ]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        $id = $this->pangkat_golongan?->id ?? null;
+        $pangkatGolonganId = $this->route('pangkat_golongan')->id;
         return [
-            'pangkat' => 'required|string|min:3|max:100|unique:pangkat_golongans,pangkat,' . $id,
-            'golongan' => ['required', 'string', 'min:1', 'regex:/^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/i'],
-            'ruang' => 'required|string|max:1|regex:/^[a-z]+$/',
+            'pangkat' => [
+                'required',
+                'string',
+                'min:3',
+                'max:100',
+                Rule::unique('pangkat_golongans', 'pangkat')->ignore($pangkatGolonganId),
+                'regex:/^[A-Za-z\s\-\/]+$/',
+            ],
+            'golongan' => [
+                'required',
+                'string',
+                'min:1',
+                'max:4',
+                'regex:/^(I|II|III|IV)$/',
+            ],
+            'ruang' => [
+                'required',
+                'string',
+                'size:1',
+                'regex:/^[a-e]$/',
+            ],
         ];
     }
 
@@ -37,6 +68,7 @@ class UpdatePangkatGolonganRequest extends FormRequest
             'pangkat.min' => 'Pangkat minimal 3 karakter.',
             'pangkat.max' => 'Pangkat tidak boleh lebih dari 100 karakter.',
             'pangkat.unique' => 'Pangkat sudah ada.',
+            'pangkat.regex' => 'Pangkat hanya boleh mengandung huruf, spasi, dash (-), dan slash (/).',
 
             'golongan.required' => 'Golongan harus diisi.',
             'golongan.string' => 'Golongan harus berupa string.',
@@ -45,8 +77,8 @@ class UpdatePangkatGolonganRequest extends FormRequest
 
             'ruang.required' => 'Ruang harus diisi.',
             'ruang.string' => 'Ruang harus berupa string.',
-            'ruang.max' => 'Ruang tidak boleh lebih dari 1 karakter.',
-            'ruang.regex' => 'Ruang harus berupa huruf kecil (a, b, c, d).',
+            'ruang.size' => 'Ruang harus terdiri dari 1 karakter.',
+            'ruang.regex' => 'Ruang harus berupa huruf kecil (a, b, c, d, e).',
         ];
     }
 }

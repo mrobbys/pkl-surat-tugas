@@ -14,13 +14,13 @@ class UserController extends Controller
 {
     // service user
     protected $userService;
-    
+
     // inject service via constructor
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
     }
-    
+
     /**
      * Tampil semua data users
      * 
@@ -30,12 +30,16 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        // jika request ajax, maka kembalikan data json untuk datatables
         if ($request->ajax()) {
-            // ambil data users kecuali superadmin
-            $data = $this->userService->getAllUsers();
-
-            return response()->json(['data' => $data]);
+            try {
+                $data = $this->userService->getAllUsers();
+                return response()->json(['data' => $data]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Gagal mengambil data users.'
+                ], 500);
+            }
         }
         return view('pages.users.index');
     }
@@ -47,8 +51,15 @@ class UserController extends Controller
      */
     public function create()
     {
-        $data = $this->userService->createUser();
-        return response()->json(['data' => $data]);
+        try {
+            $data = $this->userService->createUser();
+            return response()->json(['data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mengambil data form.'
+            ], 500);
+        }
     }
 
     /**
@@ -69,12 +80,9 @@ class UserController extends Controller
                 'text' => 'Anda tidak memiliki izin untuk membuat user.',
             ], 403);
         }
-        
-        // validasi request
-        $data = $request->validated();
 
         try {
-            $this->userService->storeUser($data);
+            $this->userService->storeUser($request->validated());
 
             // kembalikan response json berhasil
             return response()->json([
@@ -84,13 +92,12 @@ class UserController extends Controller
                 'text' => 'User berhasil ditambahkan!',
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Error creating User: ' . $e->getMessage());
             // jika error, kembalikan response json gagal
             return response()->json([
                 'status' => 'error',
                 'icon' => 'error',
                 'title' => 'Gagal',
-                'text' => 'User gagal ditambahkan! ' . $e->getMessage(),
+                'text' => 'User gagal ditambahkan. Silahkan coba lagi.',
             ], 500);
         }
     }
@@ -103,8 +110,15 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $data = $this->userService->getUser($user);
-        return response()->json(['data' => $data]);
+        try {
+            $data = $this->userService->getUser($user);
+            return response()->json(['data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mengambil detail user.'
+            ], 500);
+        }
     }
 
     /**
@@ -116,8 +130,15 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        $data = $this->userService->getUser($user);
-        return response()->json(['data' => $data]);
+        try {
+            $data = $this->userService->getUser($user);
+            return response()->json(['data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mengambil data user untuk edit.'
+            ], 500);
+        }
     }
 
     /**
@@ -138,13 +159,10 @@ class UserController extends Controller
                 'title' => 'Gagal',
                 'text' => 'Anda tidak memiliki izin untuk mengedit user.',
             ], 403);
-        }
-
-        // validasi request
-        $data = $request->validated();
+        };
 
         try {
-            $this->userService->updateUser($user, $data);
+            $this->userService->updateUser($user, $request->validated());
 
             // kembalikan response json berhasil
             return response()->json([
@@ -154,13 +172,12 @@ class UserController extends Controller
                 'text' => 'User berhasil diupdate!',
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error updating User: ' . $e->getMessage());
             // jika error, kembalikan response json gagal
             return response()->json([
                 'status' => 'error',
                 'icon' => 'error',
                 'title' => 'Gagal',
-                'text' => 'User gagal diupdate! ' . $e->getMessage(),
+                'text' => 'User gagal diupdate. Silahkan coba lagi.',
             ], 500);
         }
     }
@@ -197,7 +214,7 @@ class UserController extends Controller
                 'status' => 'error',
                 'icon' => 'error',
                 'title' => 'Gagal',
-                'text' => 'User gagal dihapus! ' . $e->getMessage(),
+                'text' => 'User gagal dihapus. Silahkan coba lagi.',
             ], 500);
         }
     }

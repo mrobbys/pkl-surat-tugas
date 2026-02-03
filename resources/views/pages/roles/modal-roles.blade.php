@@ -19,17 +19,17 @@
 
     {{-- input permissions start --}}
     <div x-show="!isShowMode"
-        class="flex w-full flex-col gap-1 text-neutral-600">
+        class="flex w-full flex-col gap-1 text-neutral-600 lg:max-h-80">
         <label class="w-fit pl-0.5 text-sm font-bold">
             Permissions <span class="text-red-500">*</span>
         </label>
         <hr class="text-neutral-300" />
-        <template x-for="(groupPermissions, groupName) in permissions"
-            :key="groupName">
-            <div class="mt-2">
-                <div class="mb-1 text-sm font-bold"
-                    x-text="groupName"></div>
-                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            <template x-for="(groupPermissions, groupName) in permissions"
+                :key="groupName">
+                <div class="mt-2">
+                    <div class="mb-1 text-sm font-bold"
+                        x-text="groupName"></div>
                     <template x-for="permission in groupPermissions"
                         :key="permission.id">
                         <div class="flex items-center gap-2">
@@ -44,8 +44,8 @@
                         </div>
                     </template>
                 </div>
-            </div>
-        </template>
+            </template>
+        </div>
         <small class="text-red-500"
             x-show="errors.permissions"
             x-text="errors.permissions"></small>

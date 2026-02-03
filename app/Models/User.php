@@ -12,6 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Cache;
 
 class User extends Authenticatable
 {
@@ -62,12 +63,16 @@ class User extends Authenticatable
      * 
      * @return string
      */
-    public function getNipAttribute($value)
+    public function getNipAttribute($value): string
     {
         try {
-            return Crypt::decryptString($value);
+            // Cek apakah sudah terenkripsi (format base64)
+            if (base64_encode(base64_decode($value, true)) === $value) {
+                return Crypt::decryptString($value);
+            }
+            return $value; // Fallback jika tidak terenkripsi
         } catch (\Exception $e) {
-            return $value; // fallback jika gagal dekripsi
+            return '******************'; // Return masked NIP jika gagal
         }
     }
 
@@ -88,6 +93,26 @@ class User extends Authenticatable
                     default => "User: {$this->nama_lengkap} telah di-{$eventName}",
                 };
             });
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // clear cache
+        static::saved(function ($user) {
+            self::clearUserRelatedCache();
+        });
+        static::deleted(function ($user) {
+            self::clearUserRelatedCache();
+        });
+    }
+
+    private static function clearUserRelatedCache(): void
+    {
+        Cache::forget('pangkat_golongan_list');
+        Cache::forget('roles_list_exclude_superadmin');
+        Cache::forget('pegawai_list');
     }
 
     public function pangkatGolongan()

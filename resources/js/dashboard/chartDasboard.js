@@ -1,3 +1,12 @@
+import { sanitizeString } from "../utils/sanitizeString.js";
+
+// konstanta untuk warna chart
+const CHART_COLORS = {
+  primary: '#4F46E5',
+  status: ['#818CF8', '#FB923C', '#F87171', '#22D3EE'],
+  golongan: ['#A78BFA', '#F472B6', '#60A5FA', '#FBBF24'],
+}
+
 // config default
 const defaultChartConfig = {
   responsive: true,
@@ -24,6 +33,7 @@ const defaultLegendConfig = {
   }
 };
 
+// tooltip config default
 const defaultTooltipConfig = {
   backgroundColor: 'rgba(0, 0, 0, 0.8)',
   bodyFont: {
@@ -37,6 +47,7 @@ const defaultTooltipConfig = {
   }
 };
 
+// show loading
 function showLoading(canvasId) {
   const loadingEl = document.getElementById(`${canvasId}-loading`);
   const canvasEl = document.getElementById(canvasId);
@@ -45,9 +56,7 @@ function showLoading(canvasId) {
   if (canvasEl) canvasEl.classList.add('hidden');
 }
 
-/**
- * Hide loading state
- */
+// hide loading
 function hideLoading(canvasId) {
   const loadingEl = document.getElementById(`${canvasId}-loading`);
   const canvasEl = document.getElementById(canvasId);
@@ -56,14 +65,13 @@ function hideLoading(canvasId) {
   if (canvasEl) canvasEl.classList.remove('hidden');
 }
 
-/**
- * Generate legend labels dengan nilai
- */
+// generate legend label
 function generateLegendLabels(chart, prefix = '') {
   return chart.data.labels.map((label, i) => {
     const dataset = chart.data.datasets[0];
     const value = dataset.data[i];
-    const displayLabel = prefix ? `${prefix} ${label}` : label;
+    const sanitizedLabel = sanitizeString(label)
+    const displayLabel = prefix ? `${prefix} ${sanitizedLabel}` : sanitizedLabel;
 
     return {
       text: `${displayLabel}: ${value}`,
@@ -76,24 +84,40 @@ function generateLegendLabels(chart, prefix = '') {
   });
 }
 
-/**
- * Generate tooltip label dengan persentase
- */
+// generate tooltip label dengan persentase
 function generateTooltipLabel(context) {
   const total = context.dataset.data.reduce((a, b) => a + b, 0);
   const value = context.parsed;
   const percentage = total > 0 ? ((value / total) * 100).toFixed(0) : 0;
-  return `${context.label}: ${value} (${percentage}%)`;
+  const sanitizedLabel = sanitizeString(context.label)
+  return `${sanitizedLabel}: ${value} (${percentage}%)`;
+}
+
+// handle fetch error
+function handleFetchError(error, canvasId, defaultMessage) {
+  console.error(`Error fetching ${canvasId}:`, error);
+  hideLoading(canvasId);
+  
+  const ctx = document.getElementById(canvasId);
+  if (ctx) {
+    handleEmptyChart(ctx, [0], defaultMessage);
+  }
 }
 
 // chart intensitas surat tugas
 export const intensityStatistics = {
   chart: null,
 
+  // mapping nama bulan untuk title di tooltip
+  fullMonthNames: [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ],
+
   init: async function () {
     const canvasId = 'intensityChart';
     showLoading(canvasId);
-    
+
     try {
       const res = await fetch('/dashboard/intensity-statistics');
       if (!res.ok) {
@@ -102,8 +126,7 @@ export const intensityStatistics = {
       const data = await res.json();
       this.renderChart(data);
     } catch (error) {
-      console.error('Error fetching intensity statistics data:', error);
-      hideLoading(canvasId);
+      handleFetchError(error, canvasId, 'Gagal memuat data intensitas');
     }
   },
 
@@ -116,9 +139,8 @@ export const intensityStatistics = {
     }
 
     if (this.chart) this.chart.destroy();
-
     hideLoading("intensityChart");
-    
+
     if (handleEmptyChart(ctx, data.data, `Data intensitas tahun ${data.year} masih kosong`)) return;
 
     this.chart = new Chart(ctx, {
@@ -128,7 +150,7 @@ export const intensityStatistics = {
         datasets: [{
           label: 'Jumlah Surat Terbit',
           data: data.data,
-          backgroundColor: '#4F46E5',
+          backgroundColor: CHART_COLORS.primary,
           borderRadius: 10,
           barPercentage: 0.5,
         }],
@@ -149,9 +171,8 @@ export const intensityStatistics = {
           },
           tooltip: {
             callbacks: {
-              label: function (context) {
-                return context.parsed.y + ' Surat';
-              }
+              title: (context) => this.fullMonthNames[context[0].dataIndex],
+              label: (context) => `${context.parsed.y} Surat`
             }
           }
         },
@@ -169,7 +190,6 @@ export const intensityStatistics = {
                 weight: 'bold'
               }
             },
-            // max: 50,
             ticks: {
               stepSize: 20,
               font: {
@@ -215,7 +235,7 @@ export const statusStatistics = {
   init: async function () {
     const canvasId = 'statusChart';
     showLoading(canvasId);
-    
+
     try {
       const res = await fetch('/dashboard/status-statistics');
       if (!res.ok) {
@@ -224,8 +244,7 @@ export const statusStatistics = {
       const data = await res.json();
       this.renderChart(data);
     } catch (error) {
-      console.error('Error fetching status statistics data:', error);
-      hideLoading(canvasId);
+      handleFetchError(error, canvasId, 'Gagal memuat data status pengajuan');
     }
   },
 
@@ -238,9 +257,8 @@ export const statusStatistics = {
     }
 
     if (this.chart) this.chart.destroy();
-
     hideLoading("statusChart");
-    
+
     if (handleEmptyChart(ctx, data.data, `Data statistik tahun ${data.year} masih kosong`)) return;
 
     const colors = ['#818CF8', '#FB923C', '#F87171', '#22D3EE']
@@ -251,7 +269,7 @@ export const statusStatistics = {
         labels: data.labels,
         datasets: [{
           data: data.data,
-          backgroundColor: colors,
+          backgroundColor: CHART_COLORS.status,
           borderWidth: 0,
           hoverOffset: 4,
         }],
@@ -303,7 +321,7 @@ export const employeeAssignmentByRank = {
   init: async function () {
     const canvasId = 'golonganChart';
     showLoading(canvasId);
-    
+
     try {
       const res = await fetch('/dashboard/golongan-statistics');
       if (!res.ok) {
@@ -312,8 +330,7 @@ export const employeeAssignmentByRank = {
       const data = await res.json();
       this.renderChart(data);
     } catch (error) {
-      console.error('Error fetching golongan statistics data:', error);
-      hideLoading(canvasId);
+      handleFetchError(error, canvasId, 'Gagal memuat data golongan');
     }
   },
 
@@ -326,15 +343,12 @@ export const employeeAssignmentByRank = {
     }
 
     if (this.chart) this.chart.destroy();
-
     hideLoading("golonganChart");
-    
+
     if (handleEmptyChart(ctx, data.data, `Data proporsi tahun ${data.year} masih kosong`)) return;
 
-    const colors = ['#A78BFA', '#F472B6', '#60A5FA', '#FBBF24'];
-
     // golongan label
-    const formattedLabels = data.labels.map(label => `Golongan ${label}`);
+    const formattedLabels = data.labels.map(label => `Golongan ${sanitizeString(label)}`);
 
     this.chart = new Chart(ctx, {
       type: 'pie',
@@ -342,7 +356,7 @@ export const employeeAssignmentByRank = {
         labels: formattedLabels,
         datasets: [{
           data: data.data,
-          backgroundColor: colors,
+          backgroundColor: CHART_COLORS.golongan,
           borderWidth: 0,
           hoverOffset: 4,
         }],
@@ -407,7 +421,7 @@ function handleEmptyChart(ctx, dataArray, message = 'Data masih kosong') {
     emptyMessage.innerHTML = `
       <div class="text-center">
         <i class="ri-pie-chart-line text-5xl text-gray-300"></i>
-        <p class="mt-2 text-gray-500">${message}</p>
+        <p class="mt-2 text-gray-500">${sanitizeString(message)}</p>
       </div>
     `;
     ctx.parentElement.appendChild(emptyMessage);

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Carbon\Carbon;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -30,5 +31,8 @@ class AppServiceProvider extends ServiceProvider
                     return response()->view('errors.429', [], 429)->withHeaders($headers);
                 });
         });
+
+        // carbon locale indonesia secara global
+        Carbon::setLocale('id');
     }
 }

@@ -24,8 +24,19 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $stats = $this->dashboardService->getDashboardStats();
-        return view('pages.dashboard', $stats);
+        try {
+            $stats = $this->dashboardService->getDashboardStats();
+            return view('pages.dashboard', $stats); //code...
+        } catch (\Exception $e) {
+            return view('pages.dashboard', [
+                'totalPegawai' => 0,
+                'totalRoles' => 0,
+                'totalSurat' => 0,
+                'recentSurat' => collect([]),
+                'recentActivities' => collect([]),
+                'currentYear' => date('Y'),
+            ])->with('error', 'Gagal memuat data dashboard :(');
+        }
     }
 
     /**
@@ -34,7 +45,16 @@ class DashboardController extends Controller
      */
     public function intensityStatistics()
     {
-        return response()->json($this->dashboardService->getIntensityStatistics());
+        try {
+            $data = $this->dashboardService->getIntensityStatistics();
+            return response()->json($data);
+        } catch (\Exception $e) {
+            return response()->json([
+                'year' => date('Y'),
+                'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                'data' => array_fill(0, 12, 0),
+            ], 500);
+        }
     }
 
     /**
@@ -43,7 +63,16 @@ class DashboardController extends Controller
      */
     public function statusStatistics()
     {
-        return response()->json($this->dashboardService->getStatusStatistics());
+        try {
+            $data = $this->dashboardService->getStatusStatistics();
+            return response()->json($data);
+        } catch (\Exception $e) {
+            return response()->json([
+                'year' => date('Y'),
+                'labels' => ['Dalam Proses', 'Revisi', 'Ditolak', 'Selesai / Terbit'],
+                'data' => [0, 0, 0, 0],
+            ], 500);
+        }
     }
 
     /**
@@ -52,7 +81,16 @@ class DashboardController extends Controller
      */
     public function golonganStatistics()
     {
-        return response()->json($this->dashboardService->getGolonganStatistics());
+        try {
+            $data = $this->dashboardService->getGolonganStatistics();
+            return response()->json($data);
+        } catch (\Exception $e) {
+            return response()->json([
+                'year' => date('Y'),
+                'labels' => ['Tidak Ada Data'],
+                'data' => [0],
+            ], 500);
+        }
     }
 
     /**
@@ -61,6 +99,11 @@ class DashboardController extends Controller
      */
     public function calendarData()
     {
-        return response()->json($this->dashboardService->getCalendarData());
+        try {
+            $data = $this->dashboardService->getCalendarData();
+            return response()->json($data);
+        } catch (\Exception $e) {
+            return response()->json([], 500);
+        }
     }
 }

@@ -8,6 +8,12 @@ import "choices.js/public/assets/styles/choices.css";
 import Chart from 'chart.js/auto'
 window.Chart = Chart;
 
+import flatpickr from "flatpickr";
+import "flatpickr/dist/themes/material_blue.css";
+import { Indonesian } from "flatpickr/dist/l10n/id.js";
+flatpickr.localize(Indonesian);
+window.flatpickr = flatpickr;
+
 import swal from 'sweetalert2';
 window.Swal = swal;
 

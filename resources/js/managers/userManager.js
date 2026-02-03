@@ -6,6 +6,7 @@ import { validationForm } from '../users/validationForm.js';
 import { storeUpdateMethods } from '../users/storeUpdate.js';
 import { editMethods } from '../users/edit.js';
 import { deleteMethods } from '../users/delete.js';
+import { sanitizeString } from '../utils/sanitizeString.js'
 
 function userManager(config) {
   return {
@@ -18,6 +19,8 @@ function userManager(config) {
     // Simpan config dari Blade agar bisa diakses sebagai `this.config`
     config: config,
 
+    dataTable: null,
+    
     // Gabungkan semua method
     ...indexMethods,
     ...showMethods,
@@ -27,18 +30,34 @@ function userManager(config) {
     ...editMethods,
     ...deleteMethods,
 
+    // sanitize string
+    sanitizeString(str) {
+      return sanitizeString(str);
+    },
+
     // ambil data pangkat golongan dan roles
     async fetchPangkatGolonganAndRoles() {
       try {
-        const response = await fetch(this.config.createUrl);
+        const response = await fetch(this.config.createUrl, {
+          headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': this.csrfToken,
+          },
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
         const data = await response.json();
-        this.pangkatGolongan = data.data.pangkat_golongan;
-        this.roles = data.data.all_roles;
+        this.pangkatGolongan = data.data.pangkat_golongan || [];
+        this.roles = data.data.all_roles || [];
 
         // Update choices setelah data tersedia
         this.updateChoicesOptions();
       } catch (error) {
         console.error('Error fetching pangkat golongan and roles:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: 'Gagal mengambil data form. Silakan refresh halaman.',
+        });
       }
     },
 
@@ -69,7 +88,7 @@ function userManager(config) {
 
         // Event listener hanya jika bukan detail mode
         if (!isDetailMode) {
-          rolesElement.addEventListener('change', (event) => {
+          rolesElement.addEventListener('change', () => {
             const selectedValues = this.rolesChoice.getValue();
             this.form.roles = Array.isArray(selectedValues)
               ? selectedValues.map((item) => item.value)
@@ -98,7 +117,7 @@ function userManager(config) {
 
         // Event listener hanya jika bukan detail mode
         if (!isDetailMode) {
-          pangkatGolonganElement.addEventListener('change', (event) => {
+          pangkatGolonganElement.addEventListener('change', () => {
             const selectedValue = this.pangkatGolonganChoice.getValue();
             this.form.pangkat_golongan_id = selectedValue ? selectedValue.value : '';
           });
@@ -162,20 +181,11 @@ function userManager(config) {
       }
     },
 
-    // // debug selected roles
-    // logSelectedRoles() {
-    //     console.log('Selected roles:', this.form.roles);
-    // },
-
-    // // debug selected pangkat golongan
-    // logSelectedPangkatGolongan() {
-    //     console.log('Selected pangkat golongan ID:', this.form.pangkat_golongan_id);
-    // },
-
     // close modal
     closeModal() {
       this.showModal = false;
       this.editingId = null;
+      this.isShowMode = false;
       this.resetForm();
 
       if (this.rolesChoice) {
@@ -199,6 +209,7 @@ function userManager(config) {
         pangkat_golongan_id: '',
         jabatan: '',
       };
+      this.originalForm = null;
       this.clearErrors();
 
       // Reset choices values
@@ -214,6 +225,19 @@ function userManager(config) {
     clearErrors() {
       this.errors = {};
     },
+
+    // cleanup
+    destroy() {
+      this.destroyDataTable();
+    },
+
+    // destory datatable
+    destroyDataTable() {
+      if (this.dataTable) {
+        this.dataTable.destroy();
+        this.dataTable = null;
+      }
+    }
   }
 }
 
