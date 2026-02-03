@@ -54,9 +54,9 @@ class RolePermissionSeeder extends Seeder
         Permission::create(['name' => 'approve telaah staf level 2', 'group' => 'Approval Telaah Staf']);
 
         // permissions untuk pdf telaah staf dan surat tugas
-        Permission::create(['name' => 'pdf telaah staf', 'group' => 'PDF']);
-        Permission::create(['name' => 'pdf nota dinas', 'group' => 'PDF']);
-        Permission::create(['name' => 'pdf surat tugas', 'group' => 'PDF']);
+        Permission::create(['name' => 'pdf telaah staf', 'group' => 'PDF Surat']);
+        Permission::create(['name' => 'pdf nota dinas', 'group' => 'PDF Surat']);
+        Permission::create(['name' => 'pdf surat tugas', 'group' => 'PDF Surat']);
 
         // Buat roles superadmin
         $roleSuperAdmin = Role::create(['name' => 'super-admin']);
@@ -75,6 +75,7 @@ class RolePermissionSeeder extends Seeder
             'create telaah staf',
             'edit telaah staf',
             'delete telaah staf',
+            'view reports',
             'pdf telaah staf',
             'pdf nota dinas',
             'pdf surat tugas'
@@ -85,6 +86,7 @@ class RolePermissionSeeder extends Seeder
         $roleKabid->givePermissionTo([
             'view telaah staf',
             'approve telaah staf level 1',
+            'view reports',
             'pdf telaah staf',
             'pdf nota dinas',
             'pdf surat tugas'
@@ -95,6 +97,7 @@ class RolePermissionSeeder extends Seeder
         $roleKadis->givePermissionTo([
             'view telaah staf',
             'approve telaah staf level 2',
+            'view reports',
             'pdf telaah staf',
             'pdf nota dinas',
             'pdf surat tugas'
@@ -110,7 +113,7 @@ class RolePermissionSeeder extends Seeder
 
         // Buat akun untuk kasi
         $kasi = User::factory()->create([
-            'nama_lengkap' => 'Kasi',
+            'nama_lengkap' => 'Ahmad Fauzi Ilham S.Kom',
             'email' => 'kasi@gmail.com',
             'pangkat_golongan_id' => 2,
         ]);
@@ -119,7 +122,7 @@ class RolePermissionSeeder extends Seeder
 
         // Buat akun untuk kabid
         $kabid = User::factory()->create([
-            'nama_lengkap' => 'Kabid',
+            'nama_lengkap' => 'Fikri Ramadhan S.Kom, M.Kom',
             'email' => 'kabid@gmail.com',
             'pangkat_golongan_id' => 4,
         ]);
@@ -128,9 +131,10 @@ class RolePermissionSeeder extends Seeder
 
         // Buat akun untuk kadis
         $kadis = User::factory()->create([
-            'nama_lengkap' => 'Kadis',
+            'nama_lengkap' => 'Asep Saputra, S.Kom, M.M',
             'email' => 'kadis@gmail.com',
             'pangkat_golongan_id' => 5,
+            'jabatan' => 'Kepala Dinas Komunikasi dan Informatika',
         ]);
         // berikan role kadis
         $kadis->assignRole('kadis');
