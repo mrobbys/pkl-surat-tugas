@@ -13,7 +13,7 @@
                     label="Tanggal Awal"
                     placeholder="Pilih tanggal awal"
                     class="datepicker-start" />
-                
+
                 <x-report-date-input name="tanggal_akhir"
                     label="Tanggal Akhir"
                     placeholder="Pilih tanggal akhir"
@@ -114,7 +114,8 @@
                     altInput: true,
                     altFormat: "j F Y",
                     allowInput: false,
-                    maxDate: 'today'
+                    maxDate: 'today',
+                    disableMobile: "true"
                 };
 
                 // ambil semua card dengan class report-card
