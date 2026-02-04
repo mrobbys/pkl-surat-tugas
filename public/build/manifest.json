@@ -1,4 +1,47 @@
 {
+  "_vendor-CHtSIihN.js": {
+    "file": "assets/vendor-CHtSIihN.js",
+    "name": "vendor",
+    "css": [
+      "assets/vendor-DrWwbZMW.css"
+    ],
+    "assets": [
+      "assets/remixicon-D5XJLTJH.eot",
+      "assets/remixicon-BDfE_iBv.woff2",
+      "assets/remixicon-B6RyWYTT.woff",
+      "assets/remixicon-B1j7v5Pq.ttf",
+      "assets/remixicon-DS68KM4N.svg"
+    ]
+  },
+  "_vendor-DrWwbZMW.css": {
+    "file": "assets/vendor-DrWwbZMW.css",
+    "src": "_vendor-DrWwbZMW.css"
+  },
+  "_vendor-calendar-QB6E09CE.js": {
+    "file": "assets/vendor-calendar-QB6E09CE.js",
+    "name": "vendor-calendar",
+    "imports": [
+      "_vendor-CHtSIihN.js"
+    ]
+  },
+  "_vendor-charts-DBcNG2t7.js": {
+    "file": "assets/vendor-charts-DBcNG2t7.js",
+    "name": "vendor-charts",
+    "imports": [
+      "_vendor-CHtSIihN.js"
+    ]
+  },
+  "_vendor-ui-libs-B7ddCF-X.js": {
+    "file": "assets/vendor-ui-libs-B7ddCF-X.js",
+    "name": "vendor-ui-libs",
+    "css": [
+      "assets/vendor-ui-libs-DqfXmp35.css"
+    ]
+  },
+  "_vendor-ui-libs-DqfXmp35.css": {
+    "file": "assets/vendor-ui-libs-DqfXmp35.css",
+    "src": "_vendor-ui-libs-DqfXmp35.css"
+  },
   "node_modules/remixicon/fonts/remixicon.eot": {
     "file": "assets/remixicon-D5XJLTJH.eot",
     "src": "node_modules/remixicon/fonts/remixicon.eot"
@@ -20,7 +63,7 @@
     "src": "node_modules/remixicon/fonts/remixicon.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-CDhtaCah.css",
+    "file": "assets/app-C6gBp0jT.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "names": [
@@ -28,19 +71,15 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-DAS9BZ7x.js",
+    "file": "assets/app-C40Ih81s.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
-    "css": [
-      "assets/app-csnyxjnv.css"
-    ],
-    "assets": [
-      "assets/remixicon-D5XJLTJH.eot",
-      "assets/remixicon-BDfE_iBv.woff2",
-      "assets/remixicon-B6RyWYTT.woff",
-      "assets/remixicon-B1j7v5Pq.ttf",
-      "assets/remixicon-DS68KM4N.svg"
+    "imports": [
+      "_vendor-CHtSIihN.js",
+      "_vendor-ui-libs-B7ddCF-X.js",
+      "_vendor-charts-DBcNG2t7.js",
+      "_vendor-calendar-QB6E09CE.js"
     ]
   }
 }
