@@ -39,6 +39,11 @@ function loginManager() {
         this.password
       );
     },
+
+    // year for copyright
+    currentYear() {
+      return new Date().getFullYear();
+    },
   };
 }
 

@@ -112,7 +112,7 @@
         {{-- Form Login End --}}
 
         <hr class="mt-6 border-gray-200" />
-        <p class="mt-4 text-center text-sm text-gray-500">&copy; 2025 Diskominfo Kota Banjarbaru</p>
+        <p class="mt-4 text-center text-sm text-gray-500">&copy; <span x-text="currentYear()"></span> Diskominfo Kota Banjarbaru</p>
 
     </div>
 </x-layouts.auth-layout>
