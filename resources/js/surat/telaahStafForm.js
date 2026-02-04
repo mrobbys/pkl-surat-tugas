@@ -175,16 +175,22 @@ export const telaahStafFormMethods = {
       ? this.config.storeUrl
       : this.config.updateUrl.replace('__ID__', this.editingId);
 
-      const method = this.mode === 'create' ? 'POST' : 'PUT';
-      
+    const method = this.mode === 'create' ? 'POST' : 'POST';
+
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': this.csrfToken,
+        'X-Requested-With': 'XMLHttpRequest',
+      }
+
+      if (this.mode !== 'create') {
+        headers['X-HTTP-Method-Override'] = 'PUT';
+      }
+
       const response = await fetch(url, {
         method: method,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': this.csrfToken,
-          'X-Requested-With': 'XMLHttpRequest',
-        },
+        headers: headers,
         body: JSON.stringify(this.form),
       });
 
