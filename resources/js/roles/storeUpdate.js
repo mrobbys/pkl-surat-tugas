@@ -17,23 +17,21 @@ export const storeUpdateMethods = {
       ? this.config.updateUrl.replace('__ID__', this.editingId)
       : this.config.storeUrl;
 
-    const method = 'POST';
-
     try {
-      const headers = {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': this.csrfToken,
-        'X-Requested-With': 'XMLHttpRequest',
-      }
+      const payload = {...this.form };
 
       if (this.editingId) {
-        headers['X-HTTP-Method-Override'] = 'PUT';
+        payload._method = 'PUT';
       }
-
+      
       const response = await fetch(url, {
-        method: method,
-        headers: headers,
-        body: JSON.stringify(this.form),
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': this.csrfToken,
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();

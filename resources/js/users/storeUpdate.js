@@ -4,20 +4,17 @@ export const storeUpdateMethods = {
     this.loading = true;
 
     // menentukan url dan method apakah create atau update
-    const isUpdate = !!this.editingId;
     const url = isUpdate
       ? this.config.updateUrl.replace('__ID__', this.editingId)
       : this.config.storeUrl;
-
-
     try {
 
       const payload = { ...this.form };
 
       // Untuk update, hanya kirim password jika diisi
-      if (isUpdate) {
-        if (!payload.password || payload.password.trim() === '') {
-          delete payload.password; // Hapus password jika kosong
+      if (this.editingId) {
+        if(!this.form.password || this.form.password.trim() === ''){
+          delete payload.password;
         }
         payload._method = 'PUT';
       }
