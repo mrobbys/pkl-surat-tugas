@@ -15,10 +15,15 @@
             @js($data ?? null),
             @js($formConfig)
         )"
-        x-init="init()">
+        x-init="init();
+            if(mode === 'show'){
+                form.tanggal_telaahan = @js($data['tanggal_telaahan_formatted'] ?? '');
+                form.tanggal_mulai = @js($data['tanggal_mulai_formatted'] ?? '');
+                form.tanggal_selesai = @js($data['tanggal_selesai_formatted'] ?? '');
+            }
+        ">
         <div class="mb-6 flex items-center justify-start gap-2 border-b pb-4">
             <a href="{{ route('surat.index') }}"
-                {{-- class="rounded-sm bg-gray-200 px-4 py-2 text-sm font-medium tracking-wide text-neutral-600 transition hover:bg-gray-300" --}}
                 class="flex cursor-pointer items-center justify-center gap-1 rounded-lg bg-gray-200 px-4 py-2 font-semibold text-neutral-600 shadow-sm transition-all duration-300 hover:bg-gray-300 focus:outline-none">
                 <i class="ri-arrow-left-s-line text-xl"></i>
                 Kembali
@@ -85,7 +90,8 @@
                     x-model="form.tanggal_telaahan"
                     x-bind:disabled="mode === 'show'"
                     isShowMode="mode !== 'show'"
-                    :mode="$mode" />
+                    :mode="$mode"
+                    />
 
                 {{-- input tanggal_telaahan end --}}
 

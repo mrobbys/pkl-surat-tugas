@@ -5,6 +5,7 @@
     'method' => 'POST',
     'icon' => 'ri-file-chart-line',
     'color' => 'teal', // teal, blue, indigo, purple, rose, amber
+    'filterText' => '',
 ])
 
 {{-- 
@@ -23,22 +24,27 @@
         'teal' => [
             'header' => 'bg-teal-600',
             'button' => 'bg-teal-700 hover:bg-teal-800',
+            'filterInfo' => 'bg-teal-50 text-teal-700',
         ],
         'amber' => [
             'header' => 'bg-amber-600',
             'button' => 'bg-amber-700 hover:bg-amber-800',
+            'filterInfo' => 'bg-amber-50 text-amber-700',
         ],
         'indigo' => [
             'header' => 'bg-indigo-600',
             'button' => 'bg-indigo-700 hover:bg-indigo-800',
+            'filterInfo' => 'bg-indigo-50 text-indigo-700',
         ],
         'fuchsia' => [
             'header' => 'bg-fuchsia-600',
             'button' => 'bg-fuchsia-700 hover:bg-fuchsia-800',
+            'filterInfo' => 'bg-fuchsia-50 text-fuchsia-700',
         ],
         'rose' => [
             'header' => 'bg-rose-600',
             'button' => 'bg-rose-700 hover:bg-rose-800',
+            'filterInfo' => 'bg-rose-50 text-rose-700',
         ],
     ];
 
@@ -67,6 +73,10 @@
         class="flex flex-1 flex-col space-y-6 p-6">
         @csrf
         <div class="flex-grow space-y-6">
+            <div class="mb-3 rounded-md {{ $colors['filterInfo'] }} p-2 text-xs">
+                <i class="ri-information-line"></i>
+                Filter berdasarkan {{ $filterText }}.
+            </div>
             {{ $slot }}
         </div>
         <button type="submit"

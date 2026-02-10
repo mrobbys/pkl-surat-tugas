@@ -24,7 +24,7 @@ class SuratPerjalananDinasService
   {
     // query semua data surat perjalanan dinas
     // $query = SuratPerjalananDinas::with(['pembuat']);
-    $query = SuratPerjalananDinas::select(['id', 'nomor_telaahan', 'tanggal_telaahan', 'pembuat_id', 'status'])->with('pembuat:id,nama_lengkap');
+    $query = SuratPerjalananDinas::select(['id', 'nomor_telaahan', 'tanggal_telaahan', 'pembuat_id', 'status', 'nomor_nota_dinas', 'nomor_surat_tugas'])->with('pembuat:id,nama_lengkap');
 
     // filter berdasarkan user yang sedang login
     $user = Auth::user();
@@ -123,6 +123,10 @@ class SuratPerjalananDinasService
     $data['tanggal_status_satu_formatted'] = $this->formatTanggalStatusPenyetuju($surat->tanggal_status_satu);
     $data['tanggal_status_dua_formatted'] = $this->formatTanggalStatusPenyetuju($surat->tanggal_status_dua);
 
+    // format tanggal telaahan, mulai, selesai
+    $data['tanggal_telaahan_formatted'] = $this->formatTanggal($surat->tanggal_telaahan);
+    $data['tanggal_mulai_formatted'] = $this->formatTanggal($surat->tanggal_mulai);
+    $data['tanggal_selesai_formatted'] = $this->formatTanggal($surat->tanggal_selesai);
 
     return $data;
   }
@@ -402,6 +406,19 @@ class SuratPerjalananDinasService
       'revisi' => 'Dikembalikan untuk direvisi',
       default => 'Diproses',
     };
+  }
+
+  /**
+   * Format tanggal ke format Indonesia
+   * @param mixed $tanggal
+   * 
+   * @return string
+   */
+  public function formatTanggal($tanggal)
+  {
+    return $tanggal
+      ? \Carbon\Carbon::parse($tanggal)->locale('id')->translatedFormat('j F Y')
+      : '-';
   }
 
   /**

@@ -7,8 +7,10 @@
                 subtitle="Surat Telaahan Staf"
                 :action="route('reports.rekapitulasi-surat-telaahan-staf')"
                 icon="ri-file-list-3-line"
-                color="teal">
-
+                color="teal"
+                filterText="tanggal telaahan staf"
+                >
+                
                 <x-report-date-input name="tanggal_awal"
                     label="Tanggal Awal"
                     placeholder="Pilih tanggal awal"
@@ -26,7 +28,9 @@
                 subtitle="Surat Nota Dinas"
                 :action="route('reports.rekapitulasi-surat-nota-dinas')"
                 icon="ri-chat-forward-line"
-                color="amber">
+                color="amber"
+                filterText="tanggal disetujui kadis"
+                >
 
                 <x-report-date-input name="tanggal_awal"
                     label="Tanggal Awal"
@@ -45,7 +49,9 @@
                 subtitle="Surat Tugas"
                 :action="route('reports.rekapitulasi-surat-tugas')"
                 icon="ri-route-line"
-                color="indigo">
+                color="indigo"
+                filterText="tanggal disetujui kadis"
+                >
 
                 <x-report-date-input name="tanggal_awal"
                     label="Tanggal Awal"
@@ -64,7 +70,9 @@
                 subtitle="Aktivitas Pegawai"
                 :action="route('reports.rekapitulasi-aktivitas-pegawai')"
                 icon="ri-pulse-line"
-                color="fuchsia">
+                color="fuchsia"
+                filterText="tanggal pelaksanaan kegiatan (surat yang disetujui kadis)"
+                >
 
                 <x-report-date-input name="tanggal_awal"
                     label="Tanggal Awal"
@@ -83,12 +91,9 @@
                 subtitle="Pegawai"
                 :action="route('reports.master-pegawai')"
                 icon="ri-database-2-line"
-                color="rose">
-
-                <div class="mb-3 rounded-md bg-rose-50 p-2 text-xs text-rose-700">
-                    <i class="ri-information-line"></i>
-                    Filter berdasarkan tanggal registrasi akun pegawai (Created At).
-                </div>
+                color="rose"
+                filterText="tanggal registrasi akun pegawai (Created At)"
+                >
 
                 <x-report-date-input name="tanggal_awal"
                     label="Tanggal Awal"

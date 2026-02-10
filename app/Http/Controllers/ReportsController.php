@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ReportsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ReportsController extends Controller
 {

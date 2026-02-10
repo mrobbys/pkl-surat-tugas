@@ -137,34 +137,48 @@ class ReportsService
     try {
       $users = User::with(['pangkatGolongan'])
         ->withCount([
+          // hitung jumlah surat yang dibuat oleh user
           'suratPerjalananDinasDibuat as jumlah_surat_dibuat' => function ($query) use ($tanggalAwal, $tanggalAkhir) {
-            $query->whereBetween('tanggal_telaahan', [$tanggalAwal, $tanggalAkhir]);
+            // filter hanya surat dengan tanggal_telaahan dalam rentang tanggal yang dipilih dan filter status =  disetujui_kadis
+            $query->whereBetween('tanggal_telaahan', [$tanggalAwal, $tanggalAkhir])
+              ->where('status', 'disetujui_kadis')
+            ;
           },
+          // hitung jumlah penugasan yang diterima oleh user
           'penugasan as jumlah_ditugaskan' => function ($query) use ($tanggalAwal, $tanggalAkhir) {
+            // filter hanya penugasan yang tanggal_mulai atau tanggal_selesai dalam rentang tanggal yang dipilih
             $query->where(function ($q) use ($tanggalAwal, $tanggalAkhir) {
               $q->whereBetween('tanggal_mulai', [$tanggalAwal, $tanggalAkhir])
                 ->orWhereBetween('tanggal_selesai', [$tanggalAwal, $tanggalAkhir]);
-            });
+            })
+              ->where('status', 'disetujui_kadis');
           }
         ])
         ->with(['penugasan' => function ($query) use ($tanggalAwal, $tanggalAkhir) {
           $query->where(function ($q) use ($tanggalAwal, $tanggalAkhir) {
             $q->whereBetween('tanggal_mulai', [$tanggalAwal, $tanggalAkhir])
               ->orWhereBetween('tanggal_selesai', [$tanggalAwal, $tanggalAkhir]);
-          });
+          })
+            ->where('status', 'disetujui_kadis');
         }])
         ->whereDoesntHave('roles', function ($query) {
           $query->where('name', 'super-admin');
         })
+        // filter hanya user yang memiliki aktivitas dalam rentang tanggal yang dipilih
         ->where(function ($query) use ($tanggalAwal, $tanggalAkhir) {
+          // user yang membuat surat dalam rentang tanggal
           $query->whereHas('suratPerjalananDinasDibuat', function ($q) use ($tanggalAwal, $tanggalAkhir) {
-            $q->whereBetween('tanggal_telaahan', [$tanggalAwal, $tanggalAkhir]);
+            $q->whereBetween('tanggal_telaahan', [$tanggalAwal, $tanggalAkhir])
+              ->where('status', 'disetujui_kadis')
+            ;
           })
+            // atau user yang ditugaskan dalam rentang tanggal
             ->orWhereHas('penugasan', function ($q) use ($tanggalAwal, $tanggalAkhir) {
               $q->where(function ($subQ) use ($tanggalAwal, $tanggalAkhir) {
                 $subQ->whereBetween('tanggal_mulai', [$tanggalAwal, $tanggalAkhir])
                   ->orWhereBetween('tanggal_selesai', [$tanggalAwal, $tanggalAkhir]);
-              });
+              })
+                ->where('status', 'disetujui_kadis');
             });
         })
         ->orderBy('nama_lengkap', 'asc')
@@ -276,7 +290,7 @@ class ReportsService
       'tanggalCetak' => Carbon::now()->translatedFormat('d F Y'),
       'user' => $user->nama_lengkap,
     ])->render();
-    
+
     $mpdf->WriteHTML($html);
 
     $fileName = 'Rekapitulasi_' . str_replace(' ', '_', $reportType) . '_' .
