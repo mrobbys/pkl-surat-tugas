@@ -4,7 +4,7 @@ export const storeUpdateMethods = {
     this.loading = true;
 
     // menentukan url dan method apakah create atau update
-    const url = isUpdate
+    const url = this.editingId
       ? this.config.updateUrl.replace('__ID__', this.editingId)
       : this.config.storeUrl;
     try {
