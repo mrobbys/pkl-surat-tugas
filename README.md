@@ -6,6 +6,7 @@ Sistem ini dibangun menggunakan Laravel 12, Tailwind CSS 4, Alpine.js, dan Postg
 
 ## ✨ Fitur Utama
 
+* **Dashboard Statistik & Kalender**: Menampilkan ringkasan data visual (grafik) dan kalender penugasan.
 * **Manajemen Role & Permissions**: Sistem otorisasi menggunakan `spatie/laravel-permission` untuk mengatur hak ases pengguna.
 * **Master Data**: CRUD (Create, Read, Update, Delete) untuk data pendukung seperti Pangkat & Golongan pegawai.
 * **Manajemen Pengguna**: Kemampuan untuk mengelola pengguna yang dapat mengakses sistem.
@@ -20,11 +21,13 @@ Sistem ini dibangun menggunakan Laravel 12, Tailwind CSS 4, Alpine.js, dan Postg
     * Pemberian status Surat Telaah Staf antara lain disetujui, direvisi, dan ditolak.
     * Jika status surat = `disetujui_kadis`, maka akan menghasilkan Nota Dinas, dan Surat Tugas.
 * **Dokumen PDF Yang Dihasilkan**: Mencetak dokumen seperti Telaah Staf, Nota Dinas, dan Surat Tugas langsung dari data yang ada di sistem.
+* **Laporan Rekapitulasi**: Fitur filter dan cetak laporan berkala untuk data Telaahan Staf, Nota Dinas, Surat Tugas, Data Pegawai, dan Aktivitas Pegawai.
+* **Log Aktivitas (*Activity Log*)**: Memantau dan merekam seluruh riwayat aktivitas yang dilakukan oleh pengguna di dalam sistem (termasuk pencatatan IP Address) untuk keperluan audit.
 
 ## 📸 Tampilan Aplikasi (Login dengan akun super-admin)
 
 * **Gambar 1: Tampilan Halaman Dashboard**:
-<img width="1280" height="694" alt="Screen Shot 2025-11-01 at 11 45 15" src="https://github.com/user-attachments/assets/5f1f7b2c-33a4-4f26-a46f-c5aaf7d956a6" />
+<img width="1280" height="695" alt="Screen Shot 2026-03-20 at 16 08 20" src="https://github.com/user-attachments/assets/62bdaee0-5c5c-4afe-bafc-92acdd934943" />
 
 * **Gambar 2: Tampilan Halaman Manajemen Role**:
 <img width="1280" height="694" alt="Screen Shot 2025-11-01 at 11 45 27" src="https://github.com/user-attachments/assets/9444c525-3631-4dda-85f7-8b28e8bee180" />
@@ -35,9 +38,14 @@ Sistem ini dibangun menggunakan Laravel 12, Tailwind CSS 4, Alpine.js, dan Postg
 * **Gambar 4: Tampilan Halaman Manajemen User**:
 <img width="1280" height="694" alt="Screen Shot 2025-11-01 at 11 46 00" src="https://github.com/user-attachments/assets/af6da381-6292-4103-b590-d2312aad35c4" />
 
-* **Gambar 5: Tampilan Halaman Surat Tugas**:
-<img width="1280" height="694" alt="Screen Shot 2025-11-01 at 11 47 05" src="https://github.com/user-attachments/assets/f9dd3451-d3d2-42f5-a51c-187460530cd1" />
+* **Gambar 5: Tampilan Halaman Activity Logs**:
+<img width="1280" height="695" alt="Screen Shot 2026-03-20 at 16 09 25" src="https://github.com/user-attachments/assets/a5ec6aea-a8ac-48f5-b78f-fc380d96f736" />
 
+* **Gambar 6: Tampilan Halaman Laporan**:
+<img width="1280" height="695" alt="Screen Shot 2026-03-20 at 16 09 42" src="https://github.com/user-attachments/assets/930df2a9-c02f-49de-84ff-a39692d7cab2" />
+
+* **Gambar 7: Tampilan Halaman Surat Tugas**:
+<img width="1280" height="694" alt="Screen Shot 2025-11-01 at 11 47 05" src="https://github.com/user-attachments/assets/f9dd3451-d3d2-42f5-a51c-187460530cd1" />
 
 ## 🛠️ Teknologi yang Digunakan
 
@@ -45,6 +53,7 @@ Sistem ini dibangun menggunakan Laravel 12, Tailwind CSS 4, Alpine.js, dan Postg
 * Laravel 12
 * PostgreSQL
 * [Spatie Laravel Permission (untuk manajemen role dan hak akses)](https://spatie.be/docs/laravel-permission/v6/introduction)
+* [Spatie Activitylog](https://spatie.be/docs/laravel-activitylog/v4/introduction) (Pencatatan log aktivitas)
 * Vite (sebagai build tool)
 * Tailwind CSS 4
 * Alpine.js
@@ -128,24 +137,27 @@ Setelah menjalankan `php artisan db:seed`, Anda dapat login menggunakan akun def
 ```plaintext
 surat-tugas-lapangan/
 ├── app/
-│   ├── Http/Controllers/  # Logika utama (UserController, RoleController, SuratPerjalananDinasController, dll.)
-│   ├── Models/            # Model  Eloquent (User, SuratPerjalananDinas, PangkatGolongan)
-│   ├── Providers/         # App Service Providers
-│   └── Services/          # Logika bisnis yang dipisahkan (UserService, RoleService, dll.)
+│   ├── Http/Controllers/  # Logika utama (UserController, RoleController, SuratPerjalananDinasController, dll.)
+│   ├── Models/            # Model Eloquent (User, SuratPerjalananDinas, PangkatGolongan)
+│   ├── Providers/         # App Service Providers
+│   ├── Services/          # Logika bisnis yang dipisahkan (UserService, RoleService, dll.)
+│   └── Traits/            # Trait pendukung (seperti LogsActivityWithIp.php)
 ├── config/                # File konfigurasi (database.php, permission.php, dll.)
 ├── database/
-│   ├── migrations/        # Skema database
-│   └── seeders/           # Data awal (RolePermissionSeeder, PangkatGolonganSeeder, dll.)
+│   ├── migrations/        # Skema database
+│   └── seeders/           # Data awal (RolePermissionSeeder, PangkatGolonganSeeder, dll.)
 ├── resources/
-│   ├── css/               # File CSS (app.css)
-│   ├── js/                # File JavaScript
-│   └── views/
-│       ├── components/    # Komponen Blade (layout, sidebar, modal)
-│       ├── pages/         # Halaman utama aplikasi (dashboard, users, roles, surat)
-│       └── pdf/           # Template Blade untuk generate PDF (surat-tugas.blade.php, dll.)
+│   ├── css/               # File CSS (app.css)
+│   ├── js/                # File JavaScript
+│   └── views/
+│       ├── components/    # Komponen Blade (layout, sidebar, modal)
+│       ├── pages/         # Halaman utama aplikasi (dashboard, users, roles, surat)
+│       └── pdf/           # Template Blade untuk generate PDF (surat-tugas.blade.php, dll.)
 ├── routes/
-│   ├── web.php            # Definisi rute utama aplikasi
-│   └── auth.php           # Rute untuk otentikasi
+│   ├── web.php            # Definisi rute utama
+│   ├── auth.php           # Rute otentikasi
+│   ├── reports.php        # Rute khusus fitur laporan
+│   └── activity.php       # Rute khusus log aktivitas
 ├── public/                # Aset publik (gambar, dan file hasil build)
 ├── .env.example           # Template untuk file konfigurasi environment
 ├── composer.json          # Dependensi PHP (Laravel, Spatie)
